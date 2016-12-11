@@ -1,0 +1,459 @@
+<head>
+  <title>Edit Program</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <link rel='stylesheet' href='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' />
+  <script src='http://code.jquery.com/jquery-1.9.1.min.js'></script>
+  <script src='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js'></script>
+  <style>
+    table td, table th { padding: 2; }
+  </style>
+</head>
+<body>
+  <div data-role='page' id='page_prog'>
+    <div data-role='header'>
+      <h3>Edit <label id='lbl_pid'></label></h3>
+      <a data-role='button' id='btn_cancel' data-theme='a' data-icon='delete' data-iconpos='left' class='ui-btn-left'>Cancel</a>
+    </div>
+    <div data-role='content'>
+      <ul data-role='listview' data-divider-theme='d'>
+        <li>
+          <table><tr>
+            <td><b>Name:</b></td><td><input type='text' size=24 maxlength=24 id='name' data-mini='true' value='New Program'></input></td>
+            <td><input type='checkbox' id='en' data-mini='true' checked><label for='en'>Enabled</label></td>
+          </tr></table>
+        </li>
+        <li data-role='list-divider'>Start Days</li>
+        <li>
+          <fieldset data-role='controlgroup' data-mini='true' data-type='horizontal'>
+            <input type='radio' name='rad_daytype' id='weekly' onclick='toggleDayType()' checked><label for='weekly'>Weekly</label>
+            <input type='radio' name='rad_daytype' id='interval' onclick='toggleDayType()'><label for='interval'>Interval</label>
+          </fieldset><br />
+          <div id='div_weekly'>
+            <fieldset data-role='controlgroup' data-type='horizontal'>
+              <script>
+              function w(s) {document.write(s);}
+              var s=['M','Tu','W','Th','F','Sa','Su'];
+              for(i=0;i<7;i++) {
+                w('<input type=checkbox data-mini=true id=wd'+i+'>');
+                w('<label for=wd'+i+'>'+s[i]+'</label>');     
+              }
+              </script>
+            </fieldset>
+          </div>
+          <div id='div_interval' style='display:none;'>
+            <table><tr>
+            <td>Every</td>
+            <td><input type='text' size=3 maxlength=3 id='intn' value='2' data-mini=true></td><td>days, starting in</td>
+            <td><input type='text' size=3 maxlength=3 id='intd' value='0' data-mini=true></td><td>day(s).</td>
+            </tr></table>
+          </div>
+        </li>
+        <li data-role='list-divider'>Restriction</li>
+        <li>
+          <fieldset data-role='controlgroup' data-mini='true' data-type='horizontal'>
+            <input type='radio' name='rad_restrict' id='restr0' checked><label for='restr0'>None</label>
+            <input type='radio' name='rad_restrict' id='restr1'><label for='restr1'>Odd days</label>
+            <input type='radio' name='rad_restrict' id='restr2'><label for='restr2'>Even days</label>
+          </fieldset>
+        </li>
+        <li data-role='list-divider'>Start Time</li>
+        <li>
+          <table><tr><td>Starts at: </td>
+            <td><input type=text size=3 maxlength=2 id=st0h value='06' data-mini=true></td><td>:</td>
+            <td><input type=text size=3 maxlength=2 id=st0m value='00' data-mini=true></td><td>(24-hour clock)</td>
+          </tr></table>
+        </li>
+        <li data-role='list-divider'>Additional Start Times</li>
+        <li>
+          <fieldset data-role='controlgroup' data-mini='true' data-type='horizontal'>
+            <input type='radio' data-mini=true name='rad_sttype' onclick='toggleSTType()' id='stnone' checked><label for='stnone'>None</label>
+            <input type='radio' data-mini=true name='rad_sttype' onclick='toggleSTType()' id='fixed'><label for='fixed'>Fixed</label>
+            <input type='radio' data-mini=true name='rad_sttype' onclick='toggleSTType()' id='repeat'><label for='repeat'>Repeat</label>
+          </fieldset>
+          <div id='div_fixed' style='display:none;'>
+            <br />
+            <span style='font-weight:normal;'>(Up to 4. Leave empty or - to disable.)</span>
+            <table>
+              <script>
+                for(i=1;i<5;i++) {
+                  w('<tr><td><b>'+i+'. </b></td><td><input type=text size=3 maxlength=2 data-mini=true id=st'+i+'h value="-"></td><td>:</td><td><input type=text size=3 maxlength=2 data-mini=true id=st'+i+'m value="-"></td></tr>');
+                }
+              </script>
+            </table>
+          </div>
+          <div id='div_repeat' style='display:none;'>
+            <br />
+            <table><tr>
+              <td>Every</td><td><input type='text' size=4 maxlength=4 id='rept' value='60' data-mini=true></td><td>minutes, for</td><td><input type='text' size=5 maxlength=4 id='repk' value='1' data-mini=true></td><td>time(s).</td>
+            </tr></table>
+          </div>
+        </li>
+        <li data-role='list-divider'>Program Tasks</li>
+        <li>
+          <div data-role='fieldcontain'>
+            <table id='tab_tasks' border=1 cellpadding=4 cellspacing=0 style='border-collapse:collapse;'>
+              <tr><td><b>Index</b></td><td><b>Zone 1</b></td><td><b>Zone 2</b></td><td><b>Zone 3</b></td><td><b>Duration</b></td></tr>
+            </table>
+          </div> 
+          <div>
+            Selected Task: <label id='lbl_sel'>-</label><br />
+            <label style='font-weight:normal;'>Click Index to select/deselect a row.<br />
+            Click an element on <u>the selected row</u> to change its value.</label>
+          </div>
+          <div data-role='controlgroup' data-type='horizontal'>
+            <button data-theme='b' data-mini='true' id='btn_app'>Append</button>
+            <button data-theme='c' data-mini='true' id='btn_ins'>Insert</button>
+            <button data-theme='c' data-mini='true' id='btn_dele'>Delete</button>
+            <button data-theme='a' data-mini='true' id='btn_clr'>Clear</button>
+          </div>
+        </li>
+        <li>
+          <table>
+            <tr><td><b>Device Key:</b></td><td><input type='password' size=20 maxlength=32 id='dkey' data-mini='true'></td></tr>
+            <tr><td colspan=2><label id='msg'></label></td></tr> 
+          </table>
+          <div data-role='controlgroup' data-type='horizontal'>
+            <button data-theme='b' id='btn_submit'>Submit</button>
+            <button data-theme='c' id='btn_run'>Run Now</button>
+            <button data-theme='c' id='btn_delp'>Remove</button>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <script>
+  function toggleDayType(){
+    $('#div_interval').hide();
+    $('#div_weekly').hide();
+    if(eval_cb('#weekly'))  $('#div_weekly').show();
+    if(eval_cb('#interval'))  $('#div_interval').show();
+  }
+  function toggleSTType() {
+    $('#div_repeat').hide();
+    $('#div_fixed').hide();      
+    if(eval_cb('#fixed')) $('#div_fixed').show();
+    if(eval_cb('#repeat')) $('#div_repeat').show();
+  }
+  function clear_msg() {$('#msg').text('');}  
+  function show_msg(s) {$('#msg').text(s).css('color','red'); setTimeout(clear_msg, 2000);}
+  function err_msg(e) {
+    if(e===3) return 'mismatch';
+    if(e===16) return 'missing data';
+    if(e===17) return 'out of bound';
+    return e;
+  }  
+  function show_result(jd,m,t) {
+    if(jd.result==2) show_msg('Device key is incorrect!');
+    else if(jd.result!=1) show_msg('Error: '+err_msg(jd.result)+', item: '+jd.item+'.');
+    else {
+      $('#msg').html('<font color=green>'+m+'</font>');
+      if(t>0) setTimeout(close, t);
+    }
+  }
+  var selected = -1;
+  var tasks=[];
+  var pid=-1;
+  function reselect_e() {
+    var tmp=selected;
+    select_e(-1);
+    select_e(tmp);
+  }
+  function select_e(id) {
+    if(selected==id) {
+      if(selected>0) {
+        $('#e'+selected).children('td').css('background-color', '');
+        selected=-1;
+      }
+    } else {
+      if($('#e'+id)) {
+        $('#e'+id).children('td').css('background-color', '#FFFF00');
+      }
+      if(selected>0) {
+        $('#e'+selected).children('td').css('background-color', '');
+      }
+      selected=id;
+    }
+    $('#lbl_sel').text(selected>0?selected:'-');
+    $('#btn_mod').button(selected>0?'enable':'disable');
+    $('#btn_dele').button(selected>0?'enable':'disable');
+    $('#btn_ins').button(selected>0?'enable':'disable');
+  }
+  function mod_e(id,n){
+    if(selected==id) {
+      e=tasks[id-1];
+      if(n=='s1') e.s1=1-e.s1;
+      if(n=='s2') e.s2=1-e.s2;
+      if(n=='s3') e.s3=1-e.s3;
+      if(n=='dur') {
+        var x=prompt('Enter duration (in seconds)', e.dur);
+        if(x) {
+          var d=parseInt(x);
+          if(d>0&&d<=64800) e.dur=d;
+        }
+      }
+      tasks[id-1]=e;
+      sync_e();
+      reselect_e();
+    }
+  }
+  function td_b(x,i,n) {return '<td onclick=mod_e('+i+',"'+n+'")>'+(x?'On':'-')+'</td>';}
+  function td_s(x,i,n) {return '<td onclick=mod_e('+i+',"'+n+'")>'+x+'</td>';}
+  function two_digits(x) {return ''+(x/10>>0)+(x%10);}
+  function convt(sec) {
+    var h=sec/3600>>0;
+    var m=(sec%3600)/60>>0;
+    var s=sec%60;
+    return ''+two_digits(h)+':'+two_digits(m)+':'+two_digits(s);
+  }
+  function append_e(e) {
+    var id=$('#tab_tasks tr').length;
+    var r='<tr id=e'+id+'><td onclick=select_e('+id+')>'+id+'</td>';
+    r+=td_b(e.s1,id,'s1');
+    r+=td_b(e.s2,id,'s2');
+    r+=td_b(e.s3,id,'s3');
+    r+=td_s(convt(e.dur),id,'dur');
+    r+='</tr>';
+    $('#tab_tasks').append(r);
+  }
+  function sync_e() {
+    $('#tab_tasks').find('tr:gt(0)').remove();
+    var i;
+    for(i=0;i<tasks.length;i++) append_e(tasks[i]);
+    
+  }
+  function eval_cb(n) {
+    return $(n).is(':checked')?1:0;
+  }
+  function get_daytype() {
+    return eval_cb('#weekly')?0:1;
+  }
+  function set_daytype(v) {
+    $(v?'#interval':'#weekly').attr('checked',true);
+    $('#weekly').checkboxradio('refresh');
+    $('#interval').checkboxradio('refresh');
+    toggleDayType();
+  }
+  function get_days() {
+    var i, days=[0,0];
+    if(eval_cb('#weekly')) {
+      for(i=0;i<7;i++) {
+        days[0]|=(eval_cb('#wd'+i)<<i);
+      }
+    } else {
+      days[0]=parseInt($('#intd').val());
+      days[1]=parseInt($('#intn').val());
+    }
+    return days;
+  }
+  function set_days(v,days) {
+    if(v) {
+      $('#intn').val(days[1]);
+      $('#intd').val(days[0]);
+    } else {
+      for(i=0;i<7;i++) {
+        $('#wd'+i).attr('checked',(days[0]&(1<<i))?true:false).checkboxradio('refresh');
+      }
+    }  
+  }
+  function get_restr() {
+    var i;
+    for(i=0;i<3;i++)
+      if(eval_cb('#restr'+i)) return i;
+    return -1;
+  }
+  function set_restr(r) {
+    $('#restr'+r).attr('checked',true);
+    var i;
+    for(i=0;i<3;i++) $('#restr'+i).checkboxradio('refresh');
+  }
+  function e2i(e){
+    var u=(e.dur<<8)|(e.s1<<0)|(e.s2<<1)|(e.s3<<2);
+    return u;
+  }
+  function i2e(u){
+    var e=[];
+    e.s1=((u>>0)&0x01);e.s2=((u>>1)&0x01);e.s3=((u>>2)&0x01);
+    e.dur=(u>>8);
+    return e;
+  }
+  function get_sttype() {
+    if(eval_cb('#stnone')) return 0;
+    if(eval_cb('#fixed'))  return 1;
+    if(eval_cb('#repeat')) return 2;
+  }
+  function set_sttype(v) {
+    if(v==1) $('#fixed').attr('checked',true);
+    else if(v==2) $('#repeat').attr('checked',true);
+    else $('#stnone').attr('checked',true);
+    $('#stnone').checkboxradio('refresh');
+    $('#fixed').checkboxradio('refresh');
+    $('#repeat').checkboxradio('refresh');
+    toggleSTType();
+  }
+  function get_st(i) {
+    var h=parseInt($('#st'+i+'h').val());
+    var m=parseInt($('#st'+i+'m').val());
+    if((h>=0)&&(h<24)&&(m>=0)&&(m<60)) return h*60+m;
+    else return -1;
+  }
+  function get_sts() {
+    var i, sts=[get_st(0),-1,-1,-1,-1];
+    if(eval_cb('#fixed'))
+      for(i=1;i<=4;i++) sts[i]=get_st(i);
+    else if(eval_cb('#repeat')) { 
+      sts[1]=parseInt($('#repk').val());
+      if(!(sts[1]>=0)) sts[1]=0;
+      sts[2]=parseInt($('#rept').val());
+      if(!(sts[2]>0)) sts[2]=0;
+    }
+    return sts;
+  }
+  function set_sts(v,sts) {
+    var i;
+    if(v==2) {
+      var h=sts[0]/60>>0;
+      var m=sts[0]%60;
+      $('#st'+0+'h').val(two_digits(h));
+      $('#st'+0+'m').val(two_digits(m));
+      $('#repk').val(sts[1]);
+      $('#rept').val(sts[2]);
+    } else {
+      for(i=0;i<=4;i++) {
+        if(sts[i]>=0) {
+          var h=sts[i]/60>>0;
+          var m=sts[i]%60;
+          $('#st'+i+'h').val(two_digits(h));
+          $('#st'+i+'m').val(two_digits(m));
+        } else {
+          $('#st'+i+'h').val('-');
+          $('#st'+i+'m').val('-');
+        }
+      }
+    }
+  }
+  $('#btn_cancel').click(function(){
+    if(confirm('Quit editing this program?')) close();
+  });
+  $('#btn_submit').click(function(){
+    if($('#name').val().length==0) {show_msg('Program name is empty!');return;}
+    if(tasks.length==0) {show_msg('Program has no tasks!');return;}
+    if(get_st(0)==-1) {show_msg('Invalid start time!');return;}
+    var days=get_days();
+    if(eval_cb('#weekly')&&days[0]==0) {show_msg('No weekday selected!');return;}
+    if(eval_cb('#interval')) {
+      if(!(days[1]>=1)) {show_msg('Invalid interval day!');return;}
+      if(!(days[0]>=0&&days[0]<days[1])) {show_msg('Invalid starting in days!');return;}
+    }
+    var sts=get_sts();    
+    if(eval_cb('#repeat')) {
+      if(!(sts[2]>=1)) {show_msg('Invalid repeat interval!');return;}
+      if(!(sts[1]>=0)) {show_msg('Invalid repeat times!');return;}
+    }
+    if(confirm('Submit changes to this program?')) {
+      var comm='cp?dkey='+encodeURIComponent($('#dkey').val())+'&pid='+pid;
+      var config=(eval_cb('#en'))|(get_daytype()<<1)|(get_restr()<<2)|(get_sttype()<<4);
+      config=config|(days[0]<<8)|(days[1]<<16);
+      comm+='&config='+config;
+      get_sts();
+      comm+='&sts=[';
+      var i;
+      for(i=0;i<sts.length-1;i++) {
+        comm+=sts[i]+',';
+      }
+      comm+=sts[i]+']';
+      comm+='&nt='+tasks.length;
+      comm+='&pt=[';
+      for(i=0;i<tasks.length;i++){
+        comm+=e2i(tasks[i]);
+        if(i!=tasks.length-1) comm+=',';
+      }
+      comm+=']&name='+encodeURIComponent($('#name').val());
+      $.getJSON(comm, function(jd){show_result(jd,'Successfully submitted.',2000);});
+    }
+  });
+  $('#btn_run').click(function(){
+    if(pid==-1) {show_msg('Please submit this program first.'); return;}
+    if(confirm('Run this program now?')) {
+      var comm='rp?dkey='+encodeURIComponent($('#dkey').val())+'&pid='+pid;
+      $.getJSON(comm, function(jd){show_result(jd,'Program has started.',2000);});
+    }
+  });
+  $('#btn_delp').click(function(){
+    if(confirm('Remove this program?')) {
+      var comm='dp?dkey='+encodeURIComponent($('#dkey').val())+'&pid='+pid;
+      $.getJSON(comm, function(jd){show_result(jd,'Program removed.',2000);});
+    }
+  });
+  $('#page_prog').on('pagebeforeshow', function(){
+    var ss=window.location.search.split('pid=');
+    pid=-1;
+    if(ss.length==2) {
+      var tmp=parseInt(ss[1]);pid=(tmp>=0)?tmp:-1;
+    }
+    $('#lbl_pid').text((pid==-1)?'New Program':'Program '+(pid+1));
+    $('#btn_run').button((pid==-1)?'disable':'enable');
+    $('#btn_delp').button((pid==-1)?'disable':'enable');  
+    $('#btn_mod').button('disable');
+    $('#btn_dele').button('disable');
+    $('#btn_ins').button('disable');
+    if(pid>=0) {
+      $.ajax('/jp', {async:false, dataType:'json', success: function(jdata) {
+        var jd=jdata.progs[pid];
+        if(!jd) return;
+        $('#en').attr('checked',(jd.config&0x01)?true:false).checkboxradio('refresh');
+        var daytype=(jd.config>>1)&0x01;
+        set_daytype(daytype);
+        var days=[(jd.config>>8)&0xFF,(jd.config>>16)&0xFF];
+        set_days(daytype, days);
+        set_restr((jd.config>>2)&0x03);
+        var sttype=(jd.config>>4)&0x03;
+        set_sttype(sttype);
+        set_sts(sttype,jd.sts);
+        
+        tasks.length=0;
+        for(i=0;i<jd.nt;i++) {
+          e=i2e(jd.pt[i]);
+          tasks.push(e);
+        }
+        $('#name').val(jd.name);
+        sync_e();
+      }});
+    }    
+  });
+  $('#btn_clr').click(function(){
+    if(confirm('Delete all program tasks?')) {
+      tasks.length=0;
+      sync_e();
+      select_e(-1);
+    }
+  });
+  $('#btn_app').click(function() {
+    var e=[];
+    e.s1=0;e.s2=0;e.s3=0;e.dur=60;
+    tasks.push(e);
+    sync_e();
+    select_e(tasks.length);
+  });
+  $('#btn_ins').click(function() {
+    var e=[];
+    e.s1=0;e.s2=0;e.s3=0;e.dur=60;
+    if(selected>0) {
+      tasks.splice(selected-1,0,e); 
+      sync_e();
+      select_e(selected+1);
+    } 
+  });
+  $('#btn_dele').click(function(){
+    if(selected>0) {
+      if(confirm('Delete the selected task?')) {
+        tasks.splice(selected-1,1);
+        sync_e();
+        select_e(-1);
+      }
+    }
+  });
+  $('table').on('selectstart', function (event) {
+    event.preventDefault();
+  });
+  </script>
+</body>

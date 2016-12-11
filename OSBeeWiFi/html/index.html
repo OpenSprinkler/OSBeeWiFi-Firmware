@@ -1,0 +1,145 @@
+<head>
+  <title>OSBeeWiFi</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <link rel='stylesheet' href='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' />
+  <script src='http://code.jquery.com/jquery-1.9.1.min.js'></script>
+  <script src='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js'></script>
+</head>
+<body>
+  <div data-role='page' id='page_home'>
+    <div data-role='header'>
+      <h3 id='l_name'>OSBWiFi</h3>
+      <a data-role='button' id='btn_upd' data-theme='a' data-icon='gear' data-iconpos='left' class='ui-btn-right'>Update</a>
+    </div>
+    <div role='main' class='ui-content'>
+      <ul data-role='listview' data-divider-theme='d'>
+        <li data-role='list-divider'>Status</li>
+        <li>
+          <table cellpadding=4 cellspacing=0>
+            <tr><td colspan=2><span id='l_time'></span> (Ver. <span id='l_fwv'></span>)</td></tr>
+            <tr><td><b>Valve:</b> <span id='l_sot'></span></td><td><b>WiFi:</b> <span id='l_rssi'></span></td></tr>
+          </table>
+        </li>
+        <li data-role='list-divider'>Zones</li>
+        <li>
+          <table cellpadding=4 cellspacing=0>
+            <script>
+            function w(s) {document.write(s);}
+            var i;
+            for(i=0;i<3;i++) w('<tr><td width=20 align=center><b><span id=zs'+i+' style="color:#800000;font-size:20">&#9898;</span></b></td><td><span id=zon'+i+'>Zone '+(i+1)+'</span></td></tr>');
+            </script>
+          </table>
+          <div id='b_status' style='display:none;'><br>
+            <table cellpadding=3 cellspacing=0>
+              <tr align=center><td><img src='http://raysfiles.com/os/sprinkler.gif'></td><td></td></tr>
+              <tr><td>Running Task <span id='l_tid'>1/1</span></td><td><span id='l_trem'></span></td></tr>
+              <tr><td>of Program <span id='l_pid'></span></td><td><span id='l_prem'></span></td></tr>
+            </table>
+          </div>
+        </li>
+        <li data-role='list-divider'>Programs</li>
+        <li>
+          <div data-role='controlgroup' data-type='horizontal'>
+            <script>
+            var i;
+            for(i=0;i<6;i++) w('<button onclick=openprog('+i+') id=btn_p'+i+'>'+(i+1)+'</a>');
+            </script>
+          </div>
+          <table><tr><td><button data-theme='b' id='btn_pre'>Program Preview</button></td></tr></table>
+        </li>
+        <li data-role='list-divider'>System</li>
+        <li>
+          <div data-role='controlgroup' data-type='horizontal'>
+            <button data-theme='b' id='btn_opt'>Settings</button>
+            <button data-theme='b' id='btn_man'>Manual</button>  
+            <button data-theme='b' id='btn_log'>Log</button>
+          </div>
+        </li>        
+      </ul>
+    </div>
+    <div data-role='footer' data-theme='c'>
+      <p style='font-weight:normal;'>&copy; OpenSprinkler Bee (<a href='http://bee.opensprinkler.com' target='_blank' style='text-decoration:none'>bee.opensprinkler.com</a>)</p>
+    </div>
+    <script>
+      $('#btn_man').click(function(e){window.open('manual.html');});
+      $('#btn_log').click(function(e){window.open('log.html');});
+      $('#btn_upd').click(function(e){window.open('update.html');});
+      $('#btn_opt').click(function(e){window.open('settings.html');});
+      $('#btn_pre').click(function(e){window.open('preview.html');})
+      var nprogs=0,ntasks=0,prem=0,trem=0,utct=0,zbits=0,si=0,ti=0;
+      function openprog(i){
+        if(i<nprogs) {
+          window.open('program.html?pid='+i);
+        } else {
+          window.open('program.html?pid=-1');
+        }
+      }    
+      $('#page_home').on('pagebeforeshow', function() {
+        if(!ti) ti=setInterval('updateTimer()', 1000);
+        updateSystem();
+        if(!si) si=setInterval('updateSystem()', 3000);
+      });
+      function updateTimer() {
+        if(prem>0) prem--;
+        if(trem>0) trem--;
+        if(utct>0) utct++;
+        showTimer();
+      }    
+      function showTimer() {
+        if (prem==0) {$('#l_prem').text('');}
+        else if (prem>0){
+          var h=(prem/3600)>>0;
+          var m=(prem-h*3600)/60>>0;
+          var s=(prem%60);
+          $('#l_prem').text('('+h+':'+(m/10>>0)+(m%10)+':'+(s/10>>0)+(s%10)+')');
+        }
+        if (trem==0) {$('#l_trem').text('');}
+        else if(trem>0){
+          var h=(trem/3600)>>0;
+          var m=(trem-h*3600)/60>>0;
+          var s=(trem%60);
+          $('#l_trem').text('('+h+':'+(m/10>>0)+(m%10)+':'+(s/10>>0)+(s%10)+')');
+        }
+        if (utct==0) {$('#l_time').text('');}
+        else if(utct>0){
+          $('#l_time').text((new Date(utct*1000)).toLocaleString());
+        }
+      }    
+      function updateSystem(jd) {
+        $.getJSON('jc', function(jd) {
+          utct=jd.utct;
+          prem=jd.prem;
+          trem=jd.trem;
+          nprogs=jd.np;
+          ntasks=jd.nt;
+          showTimer();
+          $('#l_fwv').text(''+(jd.fwv/100>>0)+'.'+(jd.fwv/10%10>>0)+'.'+(jd.fwv%10>>0));
+          $('#l_sot').text(jd.sot?'NON-latching':'Latching');
+          $('#l_rssi').text(jd.rssi+' dBm ('+(jd.rssi<-75?'weak':'ok')+')');
+          $('#l_name').text(jd.name);
+          zbits = jd.zbits;
+          for(i=0;i<3;i++) {
+            if(jd.zons) $('#zon'+i).text(jd.zons[i]);
+            $('#zs'+i).html(((jd.zbits>>i)&1)?'&#9899;':'&#9898;');
+            $('#zs'+i).css('color',((jd.zbits>>i)&1)?'#008000':'#800000');
+            $('#zon'+i).css('font-weight',((jd.zbits>>i)&1)?'bold':'normal');
+          }
+          if(jd.pid<0) {$('#b_status').hide();}
+          else {
+            $('#l_tid').text(''+(jd.tid+1)+'/'+(ntasks));
+            $('#l_pid').text(jd.pid>64?String.fromCharCode(jd.pid):(jd.pid+1));
+            $('#b_status').show();
+          }
+          var i,btn;
+          for(i=0;i<jd.mnp;i++) {
+            btn=$('#btn_p'+i);
+            if(i<nprogs) {btn.button('enable');btn.button({theme:'b'});}
+            else if(i==nprogs) {btn.button('enable');btn.button({theme:'a'});}
+            else {btn.button('disable');btn.button({theme:'c'});}
+          }          
+        });
+      }
+    </script>
+  </div>
+</body>
+
