@@ -381,7 +381,7 @@ void OSBeeWiFi::close(byte zid) {
     digitalWrite(pin, HIGH);// set the specified switch to HIGH
     digitalWrite(PIN_BST_EN, HIGH); // dump boosted voltage
     delay(100);                     // for 250ms
-    digitalWrite(PIN_COM, LOW);     // set the specified switch back to LOW
+    digitalWrite(pin, LOW);     // set the specified switch back to LOW
     digitalWrite(PIN_BST_EN, LOW);  // disable boosted voltage
     setallpins(HIGH);               // set all switches back to HIGH
   } else {
