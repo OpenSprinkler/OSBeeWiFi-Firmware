@@ -1,6 +1,6 @@
 // Created by http://oleddisplay.squix.ch/ Consider a donation
 // In case of problems make sure that you are using the font file with the correct version!
-const char Noto_Sans_Bold_12[] PROGMEM = {
+const byte Noto_Sans_Bold_12[] PROGMEM = {
 	0x0C, // Width: 12
 	0x11, // Height: 17
 	0x20, // First Char: 32
@@ -460,7 +460,7 @@ const char Noto_Sans_Bold_12[] PROGMEM = {
 
 // Created by http://oleddisplay.squix.ch/ Consider a donation
 // In case of problems make sure that you are using the font file with the correct version!
-const char Noto_Sans_12[] PROGMEM = {
+const byte Noto_Sans_12[] PROGMEM = {
 	0x0B, // Width: 11
 	0x11, // Height: 17
 	0x20, // First Char: 32

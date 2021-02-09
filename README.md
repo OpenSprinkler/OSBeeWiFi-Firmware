@@ -6,7 +6,8 @@ This folder contains the OpenSprinkler Bee WiFi (OSBeeWiFi) firmware code for Ar
 
 Updates:
 =======
-* (Dec 5) Release OSBeeWiFi firmware 1.0.0
+* (02/09/2021) Update firmware for OSBeeWiFi version 3.0
+* (12/05/2016) Release first version of OSBeeWiFi firmware
 
 
 Preparation:
@@ -15,7 +16,7 @@ Preparation:
 * Install makeEspArduino (Method 1 below), or Arduino 1.6.x with ESP8266 core (Method 2 below)
 * Blynk library for Arduino (https://github.com/blynkkk/blynk-library)
 * SSD1306 library (https://github.com/squix78/esp8266-oled-ssd1306)
-* This (OSBeeWiFi) library
+* This (OSBeeWiFi) repository
 
 
 Compilation:
@@ -27,9 +28,9 @@ If you are familiar with Makefile, I highly recommend you to use makeEspArduino:
 
 https://github.com/plerup/makeEspArduino
 
-Follow the instructions to install,and run get.py to get ESP8266 core files. Then copy the Blynk, SSD1306, and OSBeeWiFi libraries to the 'libraries' subfolder in your local esp8266 directory. The OSBeeWiFi library has an example Makefile which you can modify to match your specific path.
+Follow the instructions to install ESP8266 core files. Then download and copy the Blynk, and SSD1306libraries to the 'libraries' subfolder in your home folder's Arduino directory. The OSBeeWiFi source files has an example Makefile which you can modify to match your specific ESP8266 path.
 
-You also need to modify two files in the ESP8266 core and Blynk library. See README.txt in the Modifications folder for details. Then simply run 'make' in the OSBeeWiFi folder to compile the programs. The compiled firmware (named mainArduino.cpp.bin) by default exists in a temporary folder.
+To compile the code, simply run 'make' in the OSBeeWiFi folder to compile the programs. The compiled firmware (named osbeeArduino.cpp.bin) by default exists in a temporary folder.
 
 #### Method 2: use Arduino IDE
 
@@ -41,11 +42,11 @@ to install the ESP8266 core for Arduino. Next, copy the Blynk, SSD1306, and OSBe
 
 To compile, launch Arduino, select:
 
-* File -> Examples -> OSBeeWiFi -> mainArduino.
+* File -> Examples -> OSBeeWiFi -> osbeeMain.
 * Tools -> Board -> Generic ESP8266 Module (if this is not available, check if you've installed the ESP8266 core).
-* Tools -> Flash Size -> 4M (1M SPIFFS).
+* Tools -> Flash Size -> 4M (2M SPIFFS).
 
-Press Ctrl + R to compile. The compiled firmware (named mainArduino.cpp.bin) by default exists in a temporary folder.
+Press Ctrl + R to compile. The compiled firmware (named osbeeMain.cpp.bin) by default exists in a temporary folder.
 
 
 Upload Firmware:
