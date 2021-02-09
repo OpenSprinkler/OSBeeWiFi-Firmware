@@ -1,6 +1,7 @@
 SKETCH ?= ./examples/osbeeMain/osbeeMain.ino
 LIBS = . \
   $(ESP_LIBS)/Wire \
+  $(ESP_LIBS)/SPI \
 	$(ESP_LIBS)/ESP8266WiFi \
 	$(ESP_LIBS)/ESP8266mDNS \
 	$(ESP_LIBS)/ESP8266WebServer \

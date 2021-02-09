@@ -27,6 +27,7 @@
 #include <FS.h>
 #include <SSD1306.h>
 #include <i2crtc.h>
+#include <SPI.h>
 #include "defines.h"
 
 struct OptionStruct {
@@ -48,6 +49,7 @@ struct LogStruct {
 class OSBeeWiFi {
 public:
   static OptionStruct options[];
+  static byte version;
   static byte state;
   static byte has_rtc;
   static byte curr_zbits; // current zone bits
@@ -86,9 +88,15 @@ private:
   static File log_file;
   static File prog_file;
   static void setallpins(byte value);
+  static void set_sr_output(byte value);
   static void button_handler();
   static void boost();
   static void flashScreen();
+  static void open_v2(byte zid);
+  static void close_v2(byte zid);  
+  static void open_v3(byte zid);
+  static void close_v3(byte zid);  
+
 };
 
 #endif  // _OSBEEWIFI_H_

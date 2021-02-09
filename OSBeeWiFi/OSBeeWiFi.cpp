@@ -25,6 +25,7 @@
 #include "images.h"
 #include "program.h"
 
+byte OSBeeWiFi::version = 2;	// default version is 2
 byte OSBeeWiFi::state = OSB_STATE_INITIAL;
 byte OSBeeWiFi::has_rtc = false;
 byte OSBeeWiFi::curr_zbits = 0;
@@ -32,7 +33,7 @@ byte OSBeeWiFi::next_zbits = 0;
 byte OSBeeWiFi::program_busy = 0;
 File OSBeeWiFi::log_file;
 File OSBeeWiFi::prog_file;
-byte OSBeeWiFi::st_pins[] = {PIN_ZS0, PIN_ZS1, PIN_ZS2};
+byte OSBeeWiFi::st_pins[] = {V2_PIN_ZS0, V2_PIN_ZS1, V2_PIN_ZS2};
 ulong OSBeeWiFi::open_tstamp[]={0,0,0};
 ulong OSBeeWiFi::curr_utc_time = 0;
 SSD1306 OSBeeWiFi::display(0x3c, SDA, SCL);
@@ -69,13 +70,26 @@ ulong OSBeeWiFi::curr_loc_time() {
 
 void OSBeeWiFi::begin() {
 
-  digitalWrite(PIN_BST_PWR, LOW);
-  pinMode(PIN_BST_PWR, OUTPUT);
+  digitalWrite(PIN_BSTPWR, LOW);	// turn off boost power pin
+  pinMode(PIN_BSTPWR, OUTPUT);
 
-  digitalWrite(PIN_BST_EN, LOW);
-  pinMode(PIN_BST_EN, OUTPUT);
-
-  setallpins(HIGH);
+	// detect version: on v3 PIN_VER_DETECT is externally pulled low
+	pinMode(PIN_VER_DETECT, INPUT_PULLUP);
+	if(digitalRead(PIN_VER_DETECT)==LOW) {
+		version = 3;
+		SPI.begin(); // must call SPI.begin first, because we are using pin 12 as latch next
+	  digitalWrite(V3_PIN_SR_LAT, HIGH);	// latch pin is active low, so set it high for now
+	  pinMode(V3_PIN_SR_LAT, OUTPUT);
+	  set_sr_output(0);
+	  digitalWrite(V3_PIN_BSTNEN, HIGH);
+	  pinMode(V3_PIN_BSTNEN, OUTPUT);
+	}
+	else {
+		version = 2;
+		digitalWrite(V2_PIN_BSTEN, LOW);
+		pinMode(V2_PIN_BSTEN, OUTPUT);
+	  setallpins(HIGH);
+	}
   
   state = OSB_STATE_INITIAL;
   
@@ -109,29 +123,41 @@ void OSBeeWiFi::flashScreen() {
   boldFont(true);
   display.drawString(0, 0, "OpenSprinkler Bee");
   display.drawXbm(34, 24, WiFi_Logo_width, WiFi_Logo_height, WiFi_Logo_bits);
+  String vstring = "v";
+  vstring+=version;
+  boldFont(false);
+  display.drawString(0, 45, vstring);
   display.display();
-  boldFont(false);  
 }
 
 void OSBeeWiFi::boost() {
   // turn on boost converter for 500ms
-  digitalWrite(PIN_BST_PWR, HIGH);
-  delay(500);
-  digitalWrite(PIN_BST_PWR, LOW);  
+  digitalWrite(PIN_BSTPWR, HIGH);
+  delay(800);
+  digitalWrite(PIN_BSTPWR, LOW);  
+}
+
+/* Set shift register to a given value */
+void OSBeeWiFi::set_sr_output(byte value) {
+	if(version!=3) return;
+  digitalWrite(V3_PIN_SR_LAT, LOW);
+  SPI.transfer(value);  
+  digitalWrite(V3_PIN_SR_LAT, HIGH);
 }
 
 /* Set all pins (including COM)
  * to a given value
  */
 void OSBeeWiFi::setallpins(byte value) {
-  digitalWrite(PIN_COM, value);
+	if(version!=2) return;
+  digitalWrite(V2_PIN_COM, value);
   for(byte i=0;i<MAX_NUMBER_ZONES;i++) {
     digitalWrite(st_pins[i], value);
   }
   static byte first=true;
   if(first) {
     first=false;
-    pinMode(PIN_COM, OUTPUT);
+    pinMode(V2_PIN_COM, OUTPUT);
     for(byte i=0;i<MAX_NUMBER_ZONES;i++) {
       pinMode(st_pins[i], OUTPUT);
     }
@@ -349,40 +375,74 @@ void OSBeeWiFi::set_zone(byte zid, byte value) {
 
 // open a zone by zone index
 void OSBeeWiFi::open(byte zid) {
+	if(version==2) open_v2(zid);
+	if(version==3) open_v3(zid);
+}
+
+// close a zone
+void OSBeeWiFi::close(byte zid) {
+	if(version==2) close_v2(zid);
+	if(version==3) close_v3(zid);
+}
+
+void OSBeeWiFi::open_v3(byte zid) {
+	if(version!=3) return;
+  set_sr_output(0);
+  boost();  // boost voltage
+  set_sr_output(0b00000010 | (0b01<<((zid+1)*2)));
+  digitalWrite(V3_PIN_BSTNEN, LOW);
+  delay(100);
+  digitalWrite(V3_PIN_BSTNEN, HIGH);
+  set_sr_output(0);	
+}
+
+void OSBeeWiFi::close_v3(byte zid) {
+	if(version!=3) return;
+  set_sr_output(0);
+  digitalWrite(V3_PIN_BSTNEN, LOW);
+  boost();  // boost voltage
+  set_sr_output(0b00000001 | (0b10<<((zid+1)*2)));
+  delay(100);
+  digitalWrite(V3_PIN_BSTNEN, HIGH);
+  set_sr_output(0);	
+}
+
+void OSBeeWiFi::open_v2(byte zid) {
+	if(version!=2) return;
   byte pin = st_pins[zid];
   if(options[OPTION_SOT].ival == OSB_SOT_LATCH) {
     // for latching solenoid
     boost();  // boost voltage
     setallpins(HIGH);       // set all switches to HIGH, including COM
     digitalWrite(pin, LOW); // set the specified switch to LOW
-    digitalWrite(PIN_BST_EN, HIGH); // dump boosted voltage
-    delay(100);                     // for 250ms
+    digitalWrite(V2_PIN_BSTEN, HIGH); // dump boosted voltage
+    delay(100);                     // for 100ms
     digitalWrite(pin, HIGH);        // set the specified switch back to HIGH
-    digitalWrite(PIN_BST_EN, LOW);  // disable boosted voltage
+    digitalWrite(V2_PIN_BSTEN, LOW);  // disable boosted voltage
   } else {
     DEBUG_PRINT("open_nl ");
     DEBUG_PRINTLN(zid);
     // for non-latching solenoid
-    digitalWrite(PIN_BST_EN, LOW);  // disable output of boosted voltage 
+    digitalWrite(V2_PIN_BSTEN, LOW);  // disable output of boosted voltage 
     boost();                        // boost voltage
-    digitalWrite(PIN_COM, HIGH);    // set COM to HIGH
-    digitalWrite(PIN_BST_EN, HIGH); // dump boosted voltage    
+    digitalWrite(V2_PIN_COM, HIGH);    // set COM to HIGH
+    digitalWrite(V2_PIN_BSTEN, HIGH); // dump boosted voltage    
     digitalWrite(pin, LOW);         // set specified switch to LOW
   }
 }
 
-// close a zone
-void OSBeeWiFi::close(byte zid) {
+void OSBeeWiFi::close_v2(byte zid) {
+	if(version!=2) return;
   byte pin = st_pins[zid];
   if(options[OPTION_SOT].ival == OSB_SOT_LATCH) {  
     // for latching solenoid
     boost();  // boost voltage
     setallpins(LOW);        // set all switches to LOW, including COM
     digitalWrite(pin, HIGH);// set the specified switch to HIGH
-    digitalWrite(PIN_BST_EN, HIGH); // dump boosted voltage
+    digitalWrite(V2_PIN_BSTEN, HIGH); // dump boosted voltage
     delay(100);                     // for 250ms
     digitalWrite(pin, LOW);     // set the specified switch back to LOW
-    digitalWrite(PIN_BST_EN, LOW);  // disable boosted voltage
+    digitalWrite(V2_PIN_BSTEN, LOW);  // disable boosted voltage
     setallpins(HIGH);               // set all switches back to HIGH
   } else {
     DEBUG_PRINT("close_nl ");

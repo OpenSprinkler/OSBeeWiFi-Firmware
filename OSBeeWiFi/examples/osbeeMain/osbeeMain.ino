@@ -28,6 +28,7 @@
 #include <TimeLib.h>
 #include <FS.h>
 #include <Wire.h>
+#include <SPI.h>
 #include <SSD1306.h>
 #include <i2crtc.h>
 #include <OSBeeWiFi.h>

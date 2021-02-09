@@ -27,13 +27,20 @@
 #define OSB_FWV    100    // Firmware version: 100 means 1.0.0
 
 /** GPIO pins */
-#define PIN_BST_PWR 15    // Boost converter power
-#define PIN_BST_EN  16    // Boost converter enable
-#define PIN_BUTTON  0
-#define PIN_COM     2     // COM
-#define PIN_ZS0     12    // Zone switch 0
-#define PIN_ZS1     13    // Zone switch 1
-#define PIN_ZS2     14    // Zone switch 2
+#define PIN_VER_DETECT 10	// Version detection pin
+#define PIN_BUTTON     0
+#define PIN_BSTPWR    15
+
+// Version 2 pin defines
+#define V2_PIN_BSTEN   16	// Boost converter enable
+#define V2_PIN_COM     2	// COM
+#define V2_PIN_ZS0     12	// Zone switch 0
+#define V2_PIN_ZS1     13	// Zone switch 1
+#define V2_PIN_ZS2     14	// Zone switch 2
+
+// Version 3 pin defines
+#define V3_PIN_BSTNEN  16	// Boost converter enable (Active-Low)
+#define V3_PIN_SR_LAT  12 // v3 uses 74HC595 shift register, this is latch pin
 
 // Default device name
 #define DEFAULT_NAME    "My OSBee WiFi"
