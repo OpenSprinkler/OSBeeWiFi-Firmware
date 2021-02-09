@@ -38,7 +38,7 @@ Go to http://arduino.cc to download and install the Arduino software. Then follo
 
 https://github.com/esp8266/Arduino
 
-to install the ESP8266 core for Arduino. Next, copy the Blynk, SSD1306, and OSBeeWiFi libraries to your Arduino's 'libraries' subfolder. You also need to modify two files in the ESP8266 core and Blynk library. See README.txt in the Modifications folder for details.
+to install the ESP8266 core for Arduino. Next, copy the Blynk, SSD1306, and OSBeeWiFi libraries to your Arduino's 'libraries' subfolder.
 
 To compile, launch Arduino, select:
 
