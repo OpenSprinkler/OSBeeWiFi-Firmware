@@ -61,7 +61,9 @@ OptionStruct OSBeeWiFi::options[] = {
   {"name", 0, 0, DEFAULT_NAME},
   {"zon0", 0, 0, "Zone 1"},
   {"zon1", 0, 0, "Zone 2"},
-  {"zon2", 0, 0, "Zone 3"}
+  {"zon2", 0, 0, "Zone 3"},
+  {"bsvo", 0, 21, ""},
+  {"bsvc", 0, 21, ""},  
 };
 
 ulong OSBeeWiFi::curr_loc_time() {
@@ -130,11 +132,30 @@ void OSBeeWiFi::flashScreen() {
   display.display();
 }
 
-void OSBeeWiFi::boost() {
-  // turn on boost converter for 500ms
-  digitalWrite(PIN_BSTPWR, HIGH);
-  delay(800);
-  digitalWrite(PIN_BSTPWR, LOW);  
+void OSBeeWiFi::boost(bool direction) {
+  // turn on boost converter for a maximum of 1000 ms
+  if(version==2) {
+  	// version 2 does not have mechanism to control boost voltage
+		digitalWrite(PIN_BSTPWR, HIGH);
+		delay(800);
+		digitalWrite(PIN_BSTPWR, LOW);
+	} else {
+		// version 3 uses A0 to control boosted voltage
+		digitalWrite(PIN_BSTPWR, HIGH);
+		uint16_t volt=21; // maximum voltage by design is 21 volt
+		if(direction==OPEN) {
+			if(options[OPTION_BSVO].ival>=5) volt=options[OPTION_BSVO].ival; // if bsvo is defined
+		} else {
+			if(options[OPTION_BSVC].ival>=5) volt=options[OPTION_BSVC].ival; // if bsvc is defined		
+		}
+		uint16_t top = (uint16_t)(volt * 20.5f); // ADC voltage divider uses 1.6k/79.9k
+		uint32_t start = millis();
+		// delay for the smaller of 1000 ms and the time for A0 to reach top value
+		while(millis()<start+1000 && analogRead(A0)<top) {
+			delay(10);
+		}
+		digitalWrite(PIN_BSTPWR, LOW);
+	}
 }
 
 /* Set shift register to a given value */
@@ -388,7 +409,7 @@ void OSBeeWiFi::close(byte zid) {
 void OSBeeWiFi::open_v3(byte zid) {
 	if(version!=3) return;
   set_sr_output(0);
-  boost();  // boost voltage
+  boost(OPEN);  // boost voltage
   set_sr_output(0b00000010 | (0b01<<((zid+1)*2)));
   digitalWrite(V3_PIN_BSTNEN, LOW);
   delay(100);
@@ -400,7 +421,7 @@ void OSBeeWiFi::close_v3(byte zid) {
 	if(version!=3) return;
   set_sr_output(0);
   digitalWrite(V3_PIN_BSTNEN, LOW);
-  boost();  // boost voltage
+  boost(CLOSE);  // boost voltage
   set_sr_output(0b00000001 | (0b10<<((zid+1)*2)));
   delay(100);
   digitalWrite(V3_PIN_BSTNEN, HIGH);
@@ -412,7 +433,7 @@ void OSBeeWiFi::open_v2(byte zid) {
   byte pin = st_pins[zid];
   if(options[OPTION_SOT].ival == OSB_SOT_LATCH) {
     // for latching solenoid
-    boost();  // boost voltage
+    boost(OPEN);  // boost voltage
     setallpins(HIGH);       // set all switches to HIGH, including COM
     digitalWrite(pin, LOW); // set the specified switch to LOW
     digitalWrite(V2_PIN_BSTEN, HIGH); // dump boosted voltage
@@ -424,7 +445,7 @@ void OSBeeWiFi::open_v2(byte zid) {
     DEBUG_PRINTLN(zid);
     // for non-latching solenoid
     digitalWrite(V2_PIN_BSTEN, LOW);  // disable output of boosted voltage 
-    boost();                        // boost voltage
+    boost(OPEN);                        // boost voltage
     digitalWrite(V2_PIN_COM, HIGH);    // set COM to HIGH
     digitalWrite(V2_PIN_BSTEN, HIGH); // dump boosted voltage    
     digitalWrite(pin, LOW);         // set specified switch to LOW
@@ -436,7 +457,7 @@ void OSBeeWiFi::close_v2(byte zid) {
   byte pin = st_pins[zid];
   if(options[OPTION_SOT].ival == OSB_SOT_LATCH) {  
     // for latching solenoid
-    boost();  // boost voltage
+    boost(CLOSE);  // boost voltage
     setallpins(LOW);        // set all switches to LOW, including COM
     digitalWrite(pin, HIGH);// set the specified switch to HIGH
     digitalWrite(V2_PIN_BSTEN, HIGH); // dump boosted voltage

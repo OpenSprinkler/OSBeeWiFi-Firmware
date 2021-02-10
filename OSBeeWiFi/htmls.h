@@ -1086,6 +1086,8 @@ w('<tr><td><b>Zone'+(i+1)+' Name:</b></td><td><input type=text size=20 maxlength
 <option value=0>Latching (bi-stable)</option>
 <option value=1>Non-latching (mono-stable)</option>
 </select></td></tr> 
+<tr><td><b>Boost Volt.:</b><br><small>for opening zone</small></td><td><input type='text' size=2 maxlength=2 id='bsvo' data-mini='true' placeholder='(leave blank to use default)'></td></tr>
+<tr><td><b>Boost Volt.:</b><br><small>for closing zone</small></td><td><input type='text' size=2 maxlength=2 id='bsvc' data-mini='true' placeholder='(leave blank to use default)'></td></tr>
 <tr><td><b>HTTP Port:</b></td><td><input type='text' size=5 maxlength=5 id='htp' value=1 data-mini='true'></td></tr>
 <tr><td><b>Device Key:</b></td><td><input type='password' size=24 maxlength=32 id='dkey' data-mini='true'></td></tr>
 <tr><td colspan=2><p id='msg'></p></td></tr>
@@ -1118,6 +1120,14 @@ $('#nkey').textinput($(this).is(':checked')?'enable':'disable');
 $('#ckey').textinput($(this).is(':checked')?'enable':'disable');
 });
 $('#btn_cancel').click(function(e){ e.preventDefault(); close(); });
+function check_bsv(n) {
+let bsv=$(n).val();
+if(bsv.length>0) {
+let bsvi = parseInt(bsv);
+if(bsvi>=5 && bsvi<=21) return bsvi;
+else { show_msg('Boost voltage out of bound!'); return -1;}
+} else { return 0; }
+}
 $('#btn_submit').click(function(e){
 e.preventDefault();
 if(confirm('Submit changes?')) {
@@ -1125,7 +1135,13 @@ var comm='co?dkey='+encodeURIComponent($('#dkey').val());
 comm+='&tmz='+$('#tmz').val();
 comm+='&sot='+$('#sot').val();
 comm+='&htp='+$('#htp').val();
-comm+='&name='+encodeURIComponent($('#name').val());
+let volt = check_bsv('#bsvo');
+if(volt<0) return;
+else comm+='&bsvo='+volt;
+volt = check_bsv('#bsvc');
+if(volt<0) return;
+else comm+='&bsvc='+volt;
+comm+='&name='+encodeURIComponent($('#name').val());        
 var i;
 for(i=0;i<3;i++) comm+='&zon'+i+'='+encodeURIComponent($('#zon'+i).val());
 comm+='&auth='+encodeURIComponent($('#auth').val());
@@ -1152,6 +1168,8 @@ $.getJSON('jo', function(jd) {
 $('#tmz').val(jd.tmz).selectmenu('refresh');
 $('#sot').val(jd.sot).selectmenu('refresh');
 $('#htp').val(jd.htp);
+if(jd.bsvo) $('#bsvo').val(jd.bsvo);
+if(jd.bsvc) $('#bsvc').val(jd.bsvc);
 $('#name').val(jd.name);
 var i;
 for(i=0;i<3;i++) $('#zon'+i).val(jd.zons[i]);

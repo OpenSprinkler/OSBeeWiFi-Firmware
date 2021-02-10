@@ -103,6 +103,8 @@ typedef enum {
   OPTION_ZON0,    // zone 1 name
   OPTION_ZON1,    // zone 2 name
   OPTION_ZON2,    // zone 3 name
+  OPTION_BSVO,		// boosted voltage for opening
+  OPTION_BSVC,		// boosted voltage for closing
   NUM_OPTIONS     // number of options
 } OSB_OPTION_enum;
 

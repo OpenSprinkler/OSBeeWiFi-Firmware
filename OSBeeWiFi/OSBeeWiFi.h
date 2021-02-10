@@ -46,6 +46,11 @@ struct LogStruct {
   byte  tid;    // task id
 };
 
+enum {
+	OPEN = 0,
+	CLOSE = 1
+};
+
 class OSBeeWiFi {
 public:
   static OptionStruct options[];
@@ -90,7 +95,7 @@ private:
   static void setallpins(byte value);
   static void set_sr_output(byte value);
   static void button_handler();
-  static void boost();
+  static void boost(bool direction);
   static void flashScreen();
   static void open_v2(byte zid);
   static void close_v2(byte zid);  

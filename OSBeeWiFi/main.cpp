@@ -606,6 +606,7 @@ void on_sta_options() {
         append_key_value(html, o->name.c_str(), o->sval);
       }
     } else {  // if this is a int option
+    	if(osb.version==2 && (i==OPTION_BSVO || i==OPTION_BSVC)) continue; // only version 3 and above has bsvo and bsvc option    
       append_key_value(html, o->name.c_str(), (ulong)o->ival);
     }
   }
