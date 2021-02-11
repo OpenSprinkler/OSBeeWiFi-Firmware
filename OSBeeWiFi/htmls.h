@@ -1086,8 +1086,8 @@ w('<tr><td><b>Zone'+(i+1)+' Name:</b></td><td><input type=text size=20 maxlength
 <option value=0>Latching (bi-stable)</option>
 <option value=1>Non-latching (mono-stable)</option>
 </select></td></tr> 
-<tr><td><b>Boost Volt.:</b><br><small>for opening zone</small></td><td><input type='text' size=2 maxlength=2 id='bsvo' data-mini='true' placeholder='(leave blank to use default)'></td></tr>
-<tr><td><b>Boost Volt.:</b><br><small>for closing zone</small></td><td><input type='text' size=2 maxlength=2 id='bsvc' data-mini='true' placeholder='(leave blank to use default)'></td></tr>
+<tr id='tr_bsvo' style='display:none;'><td><b>Boost Volt.:</b><br><small>for opening zone</small></td><td><input type='text' size=2 maxlength=2 id='bsvo' data-mini='true' placeholder='(leave blank to use default)'></td></tr>
+<tr id='tr_bsvc' style='display:none;'><td><b>Boost Volt.:</b><br><small>for closing zone</small></td><td><input type='text' size=2 maxlength=2 id='bsvc' data-mini='true' placeholder='(leave blank to use default)'></td></tr>
 <tr><td><b>HTTP Port:</b></td><td><input type='text' size=5 maxlength=5 id='htp' value=1 data-mini='true'></td></tr>
 <tr><td><b>Device Key:</b></td><td><input type='password' size=24 maxlength=32 id='dkey' data-mini='true'></td></tr>
 <tr><td colspan=2><p id='msg'></p></td></tr>
@@ -1168,8 +1168,14 @@ $.getJSON('jo', function(jd) {
 $('#tmz').val(jd.tmz).selectmenu('refresh');
 $('#sot').val(jd.sot).selectmenu('refresh');
 $('#htp').val(jd.htp);
-if(jd.bsvo) $('#bsvo').val(jd.bsvo);
-if(jd.bsvc) $('#bsvc').val(jd.bsvc);
+if(typeof(jd.bsvo)!='undefined') {
+$('#tr_bsvo').show();
+if(jd.bsvo>0) $('#bsvo').val(jd.bsvo);
+}
+if(typeof(jd.bsvc)!='undefined') {
+$('#tr_bsvc').show();
+if(jd.bsvc>0) $('#bsvc').val(jd.bsvc);
+}
 $('#name').val(jd.name);
 var i;
 for(i=0;i<3;i++) $('#zon'+i).val(jd.zons[i]);

@@ -26,6 +26,7 @@
 #include "program.h"
 
 byte OSBeeWiFi::version = 2;	// default version is 2
+byte OSBeeWiFi::sr_value = 0;
 byte OSBeeWiFi::state = OSB_STATE_INITIAL;
 byte OSBeeWiFi::has_rtc = false;
 byte OSBeeWiFi::curr_zbits = 0;
@@ -92,7 +93,6 @@ void OSBeeWiFi::begin() {
 		pinMode(V2_PIN_BSTEN, OUTPUT);
 	  setallpins(HIGH);
 	}
-  
   state = OSB_STATE_INITIAL;
   
   if(!SPIFFS.begin()) {
@@ -408,24 +408,44 @@ void OSBeeWiFi::close(byte zid) {
 
 void OSBeeWiFi::open_v3(byte zid) {
 	if(version!=3) return;
-  set_sr_output(0);
-  boost(OPEN);  // boost voltage
-  set_sr_output(0b00000010 | (0b01<<((zid+1)*2)));
-  digitalWrite(V3_PIN_BSTNEN, LOW);
-  delay(100);
-  digitalWrite(V3_PIN_BSTNEN, HIGH);
-  set_sr_output(0);	
+  if(options[OPTION_SOT].ival == OSB_SOT_LATCH) {
+	  set_sr_output(0);
+		boost(OPEN);  // boost voltage
+		set_sr_output(0b00000010 | (0b01<<((zid+1)*2)));
+		digitalWrite(V3_PIN_BSTNEN, LOW);
+		delay(100);
+		digitalWrite(V3_PIN_BSTNEN, HIGH);
+		set_sr_output(0);	
+	} else {
+    DEBUG_PRINT("open_nl ");
+ 		digitalWrite(V3_PIN_BSTNEN, HIGH);
+    boost(OPEN);
+    sr_value |= (0b00000010 | (0b01<<((zid+1)*2)));
+    set_sr_output(sr_value);
+		DEBUG_PRINTLN(sr_value);
+    digitalWrite(V3_PIN_BSTNEN, LOW);
+	}
 }
 
 void OSBeeWiFi::close_v3(byte zid) {
 	if(version!=3) return;
   set_sr_output(0);
-  digitalWrite(V3_PIN_BSTNEN, LOW);
-  boost(CLOSE);  // boost voltage
-  set_sr_output(0b00000001 | (0b10<<((zid+1)*2)));
-  delay(100);
-  digitalWrite(V3_PIN_BSTNEN, HIGH);
-  set_sr_output(0);	
+	if(options[OPTION_SOT].ival == OSB_SOT_LATCH) {    
+		digitalWrite(V3_PIN_BSTNEN, LOW);
+		boost(CLOSE);  // boost voltage
+		set_sr_output(0b00000001 | (0b10<<((zid+1)*2)));
+		delay(100);
+		digitalWrite(V3_PIN_BSTNEN, HIGH);
+		set_sr_output(0);	
+	} else {
+    DEBUG_PRINT("close_nl ");
+    DEBUG_PRINTLN(zid);
+    sr_value &= ~(0b11<<((zid+1)*2));
+    // for non-latching solenoid
+    if((sr_value & 0b11111100) == 0) sr_value = 0; // if no zone is open, turn COM off as well
+    DEBUG_PRINTLN(sr_value);
+		set_sr_output(sr_value);
+	}
 }
 
 void OSBeeWiFi::open_v2(byte zid) {

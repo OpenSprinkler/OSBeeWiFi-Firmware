@@ -606,7 +606,8 @@ void on_sta_options() {
         append_key_value(html, o->name.c_str(), o->sval);
       }
     } else {  // if this is a int option
-    	if(osb.version==2 && (i==OPTION_BSVO || i==OPTION_BSVC)) continue; // only version 3 and above has bsvo and bsvc option    
+    	if(osb.version==2 && (i==OPTION_BSVO || i==OPTION_BSVC)) continue; // only version 3 and above has bsvo and bsvc option
+    	if(osb.version==3 && (i==OPTION_BSVC && osb.options[OPTION_SOT].ival == OSB_SOT_NONLATCH)) continue; // if valve type is nonlatch then don't send bsvc option
       append_key_value(html, o->name.c_str(), (ulong)o->ival);
     }
   }

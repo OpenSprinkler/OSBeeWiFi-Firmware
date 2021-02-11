@@ -92,6 +92,7 @@ private:
   static byte st_pins[];
   static File log_file;
   static File prog_file;
+  static byte sr_value;
   static void setallpins(byte value);
   static void set_sr_output(byte value);
   static void button_handler();
@@ -100,7 +101,7 @@ private:
   static void open_v2(byte zid);
   static void close_v2(byte zid);  
   static void open_v3(byte zid);
-  static void close_v3(byte zid);  
+  static void close_v3(byte zid);
 
 };
 
