@@ -993,23 +993,30 @@ void time_keeping() {
 
   if(!configured) {
     DEBUG_PRINTLN(F("config time server"));
-    configTime(0, 0, "pool.ntp.org", "time.nist.org", NULL);
+    configTime(0, 0, "0.pool.ntp.org", "time.google.com", "1.pool.ntp.org");
     if (osb.has_rtc) {
       curr_utc_time = RTC.get();
     }
     configured = true;
   }
 
-  if(!curr_utc_time || curr_utc_time > time_keeping_timeout) {
+  if(curr_utc_time<MIN_EPOCH_TIME || curr_utc_time > time_keeping_timeout) {
     if (osb.has_rtc) curr_utc_time = RTC.get();  // get time from RTC
     if (osb.state == OSB_STATE_CONNECTED) {
-      ulong gt = time(NULL);
-      if(!gt) gt = time(NULL);  // try one more time if it didn't get time first time
-      if(gt) {
+    	byte tick = 0;
+    	ulong gt = 0;
+    	do {
+    		gt = time(NULL);
+    		tick++;
+    		delay(2000);
+    	} while(gt<MIN_EPOCH_TIME && tick<10);
+      if(gt>MIN_EPOCH_TIME) {
         if (osb.has_rtc) RTC.set(gt);
         curr_utc_time = gt;
         DEBUG_PRINT(F("network time: "));
         DEBUG_PRINTLN(gt);
+      } else {
+      	DEBUG_PRINTLN(F("NTP failed."));
       }
     }
     time_keeping_timeout = curr_utc_time + TIME_SYNC_TIMEOUT;
