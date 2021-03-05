@@ -410,12 +410,12 @@ void OSBeeWiFi::open_v3(byte zid) {
 	if(version!=3) return;
   if(options[OPTION_SOT].ival == OSB_SOT_LATCH) {
 	  set_sr_output(0);
+		digitalWrite(V3_PIN_BSTNEN, LOW); // enable output path
 		boost(OPEN);  // boost voltage
 		set_sr_output(0b00000010 | (0b01<<((zid+1)*2)));
-		digitalWrite(V3_PIN_BSTNEN, LOW);
-		delay(100);
-		digitalWrite(V3_PIN_BSTNEN, HIGH);
+		delay(150);
 		set_sr_output(0);	
+		digitalWrite(V3_PIN_BSTNEN, HIGH); // disable output path
 	} else {
     DEBUG_PRINT("open_nl ");
  		digitalWrite(V3_PIN_BSTNEN, HIGH);
@@ -430,13 +430,14 @@ void OSBeeWiFi::open_v3(byte zid) {
 void OSBeeWiFi::close_v3(byte zid) {
 	if(version!=3) return;
   set_sr_output(0);
-	if(options[OPTION_SOT].ival == OSB_SOT_LATCH) {    
-		digitalWrite(V3_PIN_BSTNEN, LOW);
+	if(options[OPTION_SOT].ival == OSB_SOT_LATCH) {
+	  set_sr_output(0);	
+		digitalWrite(V3_PIN_BSTNEN, LOW); // enable output path
 		boost(CLOSE);  // boost voltage
 		set_sr_output(0b00000001 | (0b10<<((zid+1)*2)));
-		delay(100);
-		digitalWrite(V3_PIN_BSTNEN, HIGH);
+		delay(150);
 		set_sr_output(0);	
+		digitalWrite(V3_PIN_BSTNEN, HIGH); // disable output path		
 	} else {
     DEBUG_PRINT("close_nl ");
     DEBUG_PRINTLN(zid);
