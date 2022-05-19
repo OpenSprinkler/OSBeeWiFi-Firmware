@@ -985,7 +985,7 @@ void process_display() {
 }
 
 extern "C" time_t time(time_t*);
-
+/*
 void time_keeping() {
   static bool configured = false;
   static ulong prev_millis = 0;
@@ -993,7 +993,7 @@ void time_keeping() {
 
   if(!configured) {
     DEBUG_PRINTLN(F("config time server"));
-    configTime(0, 0, "0.pool.ntp.org", "time.google.com", "1.pool.ntp.org");
+    configTime(0, 0, "time.google.com", "time.nist.gov", "time.windows.com");
     if (osb.has_rtc) {
       curr_utc_time = RTC.get();
     }
@@ -1027,7 +1027,46 @@ void time_keeping() {
     prev_millis += 1000;
   }
 }
+*/
+void time_keeping() {
+  static bool configured = false;
+  static ulong prev_millis = 0;
+  static ulong time_keeping_timeout = 0;
 
+  if(!configured) {
+  	configTime(0, 0, "0.pool.ntp.org", "time.google.com", "1.pool.ntp.org");
+	  delay(2000);
+    configured = true;
+  }
+
+  if(!curr_utc_time || (curr_utc_time > time_keeping_timeout)) {
+  	byte tick = 0;
+  	ulong gt = 0;
+  	do {
+  		gt = time(nullptr);
+  		tick++;
+  		delay(2000);
+  	} while(gt<978307200L && tick<10);
+    if(gt<978307200L) {
+      // if we didn't get response, re-try after 2 seconds
+      DEBUG_PRINTLN(F("ntp invalid! re-try in 60 seconds"));
+      time_keeping_timeout = curr_utc_time + 60;
+    } else {
+      curr_utc_time = gt;
+      DEBUG_PRINT(F("Updated time from NTP: "));
+      DEBUG_PRINT(curr_utc_time);
+      DEBUG_PRINT(" Hour: ");
+      // if we got a response, re-try after TIME_SYNC_TIMEOUT seconds
+      time_keeping_timeout = curr_utc_time + TIME_SYNC_TIMEOUT;
+      prev_millis = millis();
+    }
+  }
+  
+  while(millis() - prev_millis >= 1000) {
+    curr_utc_time ++;
+    prev_millis += 1000;
+  }
+}
 void do_loop() {
   static ulong connecting_timeout;
   
