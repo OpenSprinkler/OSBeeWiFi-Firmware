@@ -54,8 +54,8 @@ void ProgramData::save_count() {
 }
 
 void ProgramData::init() {
-	reset_runtime();
-	File file;
+  reset_runtime();
+  File file;
   if(!SPIFFS.exists(prog_fname)) {
     // create program data file
     DEBUG_PRINTLN(F("create program data..."));

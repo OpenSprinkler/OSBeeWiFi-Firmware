@@ -10,7 +10,6 @@ const char connect_html[] PROGMEM = R"(<head>
 <table cellspacing=16>
 <tr><td><input type='text' name='ssid' id='ssid'></td><td>(SSID)</td></tr>
 <tr><td><input type='password' name='pass' id='pass'></td><td>(Password)</td></tr>
-<tr><td><input type='text' name='auth' id='auth'></td><td>(Auth Token)</td></tr>
 <tr><td colspan=2><p id='msg'></p></td></tr>
 <tr><td><button type='button' id='butt' onclick='sf();' style='height:36px;width:180px'>Submit</button></td><td></td></tr>
 </table>
@@ -42,13 +41,13 @@ var jd=JSON.parse(xhr.responseText);
 if(jd.result==1) { tci=setInterval(tryConnect, 10000); return; }
 id('msg').innerHTML='<b><font color=red>Error code: '+jd.result+', item: '+jd.item+'</font></b>';
 id('butt').innerHTML='Submit';
-id('butt').disabled=false;id('ssid').disabled=false;id('pass').disabled=false;id('auth').disabled=false;
+id('butt').disabled=false;id('ssid').disabled=false;id('pass').disabled=false;
 }
 }
-var comm='cc?ssid='+encodeURIComponent(id('ssid').value)+'&pass='+encodeURIComponent(id('pass').value)+'&auth='+id('auth').value;
+var comm='cc?ssid='+encodeURIComponent(id('ssid').value)+'&pass='+encodeURIComponent(id('pass').value);
 xhr.open('POST', comm, true); xhr.send();
 id('butt').innerHTML='Connecting...';
-id('butt').disabled=true;id('ssid').disabled=true;id('pass').disabled=true;id('auth').disabled=true;
+id('butt').disabled=true;id('ssid').disabled=true;id('pass').disabled=true;
 }
 
 function loadSSIDs() {
@@ -87,7 +86,7 @@ const char index_html[] PROGMEM = R"(<head>
 <li data-role='list-divider'>Status</li>
 <li>
 <table cellpadding=4 cellspacing=0>
-<tr><td colspan=2><span id='l_time'></span> (Ver. <span id='l_fwv'></span>)</td></tr>
+<tr><td colspan=2><span id='l_time'></span></td></tr>
 <tr><td><b>Valve:</b> <span id='l_sot'></span></td><td><b>WiFi:</b> <span id='l_rssi'></span></td></tr>
 </table>
 </li>
@@ -129,7 +128,7 @@ for(i=0;i<6;i++) w('<button onclick=openprog('+i+') id=btn_p'+i+'>'+(i+1)+'</a>'
 </ul>
 </div>
 <div data-role='footer' data-theme='c'>
-<p style='font-weight:normal;'>&copy; OpenSprinkler Bee (<a href='http://bee.opensprinkler.com' target='_blank' style='text-decoration:none'>bee.opensprinkler.com</a>)</p>
+<p>&nbsp; OSBee Firmware v<span id='l_fwv'></span> (<a href='http://bee.opensprinkler.com' target='_blank' style='text-decoration:none'>bee.opensprinkler.com</a>)</p><div data-role='controlgroup' data-type='horizontal'><a href='update.html' target='_top' data-role='button' data-inline=true data-mini=true>Firmware Update</a><a href='https://github.com/OpenSprinkler/OSBeeWiFi-Firmware/tree/master/docs' target='_blank' data-role='button' data-inline=true data-mini=true>User Manual</a></p></div>
 </div>
 <script>
 $('#btn_man').click(function(e){window.open('manual.html');});
@@ -1081,6 +1080,8 @@ for(i=0;i<3;i++)
 w('<tr><td><b>Zone'+(i+1)+' Name:</b></td><td><input type=text size=20 maxlength=32 id=zon'+i+' data-mini=true value="Zone '+(i+1)+'"></td></tr>');
 </script>
 <tr><td><b>Cloud Token:</b></td><td><input type='text' size=32 maxlength=32 id='auth' data-mini='true' value='-'></td></tr>
+<tr><td><b>Cloud Server:</b></td><td><input type='text' size=32 maxlength=64 id='cdmn' data-mini='true' value='blynk.openthings.io'></td></tr>
+<tr><td><b>Cloud Port:</b></td><td><input type='text' size=5 maxlength=5 id='cprt' data-mini='true' value='8080'></td></tr>
 <tr><td><b>Valve Type:</b></td><td>
 <select name='sot' id='sot' data-mini='true'>
 <option value=0>Latching (bi-stable)</option>
@@ -1145,6 +1146,8 @@ comm+='&name='+encodeURIComponent($('#name').val());
 var i;
 for(i=0;i<3;i++) comm+='&zon'+i+'='+encodeURIComponent($('#zon'+i).val());
 comm+='&auth='+encodeURIComponent($('#auth').val());
+comm+='&cdmn='+encodeURIComponent($('#cdmn').val());
+comm+='&cprt='+($('#cprt').val());
 if($('#cb_key').is(':checked')) {
 if(!$('#nkey').val()) {
 if(!confirm('New device key is empty. Are you sure?')) return;
@@ -1180,6 +1183,8 @@ $('#name').val(jd.name);
 var i;
 for(i=0;i<3;i++) $('#zon'+i).val(jd.zons[i]);
 $('#auth').val(jd.auth);
+$('#cdmn').val(jd.cdmn);
+$('#cprt').val(jd.cprt);
 });
 });
 </script>
@@ -1218,10 +1223,11 @@ function clear_msg() {id('msg').innerHTML='';}
 function show_msg(s,t,c) {
 id('msg').innerHTML=s.fontcolor(c);
 if(t>0) setTimeout(clear_msg, t);
-}  
+}
+function goback() {history.back();}
 $('#btn_cancel').click(function(e){
-e.preventDefault(); close();
-});
+e.preventDefault(); goback();
+});  
 $('#btn_submit').click(function(e){
 var files= id('file').files;
 if(files.length==0) {show_msg('Please select a file.',2000,'red'); return;}
@@ -1240,7 +1246,7 @@ if(xhr.readyState==4 && xhr.status==200) {
 var jd=JSON.parse(xhr.responseText);
 if(jd.result==1) {
 show_msg('Update is successful. Rebooting. Please wait...',0,'green');
-setTimeout(close, 10000);
+setTimeout(goback, 10000);
 } else if (jd.result==2) {
 show_msg('Check device key and try again.', 0, 'red');
 } else {

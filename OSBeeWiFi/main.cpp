@@ -233,7 +233,6 @@ void on_ap_change_config() {
   if(server->hasArg("ssid")) {
     osb.options[OPTION_SSID].sval = server->arg("ssid");
     osb.options[OPTION_PASS].sval = server->arg("pass");
-    osb.options[OPTION_AUTH].sval = server->arg("auth");
     if(osb.options[OPTION_SSID].sval.length() == 0) {
       server_send_result(HTML_DATA_MISSING, "ssid");
       return;
@@ -602,7 +601,7 @@ void on_sta_options() {
   OptionStruct *o = osb.options;
   for(byte i=0;i<NUM_OPTIONS;i++,o++) {
     if(!o->max) {
-      if(i==OPTION_NAME || i==OPTION_AUTH) {  // only output selected string options
+      if(i==OPTION_NAME || i==OPTION_AUTH || i==OPTION_CDMN) {  // only output selected string options
         append_key_value(html, o->name.c_str(), o->sval);
       }
     } else {  // if this is a int option
@@ -818,7 +817,7 @@ void do_setup()
     delete server;
     server = NULL;
   }
-  WiFi.persistent(false); // turn off persistent, fixing flash crashing issue  
+  //WiFi.persistent(false); // turn off persistent, fixing flash crashing issue  
   osb.begin();
   osb.options_setup();
   // close all zones at the beginning.
@@ -1128,10 +1127,16 @@ void do_loop() {
       server->begin();
 
       if(curr_cloud_access_en) {
-        Blynk.config(osb.options[OPTION_AUTH].sval.c_str());
+        if(osb.options[OPTION_CDMN].sval.length()==0) {
+          Blynk.config(osb.options[OPTION_AUTH].sval.c_str()); // use default server
+        } else {
+          Blynk.config(osb.options[OPTION_AUTH].sval.c_str(), // use specified server
+                       osb.options[OPTION_CDMN].sval.c_str(),
+                       (uint16_t)osb.options[OPTION_CPRT].ival);
+        }
         Blynk.connect();
       }
-      osb.state = OSB_STATE_CONNECTED;      
+      osb.state = OSB_STATE_CONNECTED;
       led_blink_ms = 0;
       osb.set_led(LOW);
           

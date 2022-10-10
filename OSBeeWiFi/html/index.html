@@ -16,7 +16,7 @@
         <li data-role='list-divider'>Status</li>
         <li>
           <table cellpadding=4 cellspacing=0>
-            <tr><td colspan=2><span id='l_time'></span> (Ver. <span id='l_fwv'></span>)</td></tr>
+            <tr><td colspan=2><span id='l_time'></span></td></tr>
             <tr><td><b>Valve:</b> <span id='l_sot'></span></td><td><b>WiFi:</b> <span id='l_rssi'></span></td></tr>
           </table>
         </li>
@@ -58,7 +58,7 @@
       </ul>
     </div>
     <div data-role='footer' data-theme='c'>
-      <p style='font-weight:normal;'>&copy; OpenSprinkler Bee (<a href='http://bee.opensprinkler.com' target='_blank' style='text-decoration:none'>bee.opensprinkler.com</a>)</p>
+      <p>&nbsp; OSBee Firmware v<span id='l_fwv'></span> (<a href='http://bee.opensprinkler.com' target='_blank' style='text-decoration:none'>bee.opensprinkler.com</a>)</p><div data-role='controlgroup' data-type='horizontal'><a href='update.html' target='_top' data-role='button' data-inline=true data-mini=true>Firmware Update</a><a href='https://github.com/OpenSprinkler/OSBeeWiFi-Firmware/tree/master/docs' target='_blank' data-role='button' data-inline=true data-mini=true>User Manual</a></p></div>
     </div>
     <script>
       $('#btn_man').click(function(e){window.open('manual.html');});

@@ -47,8 +47,8 @@ struct LogStruct {
 };
 
 enum {
-	OPEN = 0,
-	CLOSE = 1
+  OPEN = 0,
+  CLOSE = 1
 };
 
 class OSBeeWiFi {

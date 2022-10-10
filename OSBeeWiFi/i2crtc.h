@@ -19,13 +19,13 @@ class I2CRTC
   public:
   I2CRTC();
   static time_t get();
-	static void set(time_t t);
-	static void read(tmElements_t &tm);
-	static void write(tmElements_t &tm);
+  static void set(time_t t);
+  static void read(tmElements_t &tm);
+  static void write(tmElements_t &tm);
   static bool detect();
   
   private:
-	static uint8_t dec2bcd(uint8_t num);
+  static uint8_t dec2bcd(uint8_t num);
   static uint8_t bcd2dec(uint8_t num);
   static uint8_t addr;
 };

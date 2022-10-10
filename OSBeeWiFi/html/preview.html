@@ -1,165 +1,165 @@
 <head>
-  <title>Program Preview</title>
-  <meta name='viewport' content='width=device-width, initial-scale=1'>
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
-  <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-  <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<title>Program Preview</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 </head>
 <body>
-  <div data-role='page' id='page_preview'>
-    <div data-role='header' data-position='fixed'>
-      <h3><span id='lbl_date'></span> Preview</h3>
-      <a href='#' id='btn_close' class='ui-btn ui-btn-icon-left ui-icon-delete'>Close</a>
-      <div data-role='controlgroup' data-type='horizontal' class='ui-btn-right'>
-        <a href='#' id='btn_prev' class='ui-btn ui-btn-icon-right ui-icon-arrow-l'>Prev</a>
-        <a href='#' id='btn_next' class='ui-btn ui-btn-icon-right ui-icon-arrow-r'>Next</a>   
-      </div>
-    </div>
-    <div id='div_plot' data-role='content'>
-      <script>
-      var date,tmz=0,intv=15,devday=0,progs;
-      var xstart=80,ystart=80,stwidth=100,stheight=120,nzones=3;
-      var winwidth=stwidth*nzones+xstart, winheight=24.5*stheight+ystart;
-      var prog_color=['rgba(0,0,200,0.3)','rgba(0,200,0,0.3)','rgba(200,0,0,0.3)','rgba(0,200,200,0.3)'];
-      function loct()   {return date.getTime()+(tmz-48)*900000;}
-      function getx(zid)  {return xstart+zid*stwidth-15;}  // x coordinate given a zone
-      function gety(t)    {return ystart+t*stheight/60;}  // y coordinate given a time
-      function w(s) {document.write(s);}
-      function plot_bar(zid,start,pid,end) { // plot program bar
-        $('#div_plot').append('<div class=bar align=center style="position:absolute;background-color:'+prog_color[(pid+3)%4]+';left:'+getx(zid)+';top:'+gety(start/60)+';border:0;width:'+stwidth+';height:'+((end-start)/60*stheight/60)+'">P'+(pid+1)+'</div>');
-      }
-      var zid,t;
-      for(zid=0;zid<=nzones;zid++) {
-        if(zid<nzones) w('<div style="position:absolute;left:'+(xstart+zid*stwidth+15)+';top:'+(ystart-25)+';width:'+stwidth+';height:20;border:0;padding:0;"><font size=2>Zone '+(zid+1)+'</font></div>');
-        w('<div style="position:absolute;left:'+getx(zid)+';top:'+(ystart-10)+';border:1px solid gray;width:0;height:'+(winheight-ystart+30)+';"></div>');
-      }
-      // horizontal grid, time
-      for(t=0;t<=24;t++) {
-        w('<div style="position:absolute;left:'+(xstart-30)+';top:'+gety(t*60)+';border:1px solid gray;width:15;height:0;"></div>');
-        w('<div style="position:absolute;left:'+(xstart-23)+';top:'+(gety(t*60)+stheight/2)+';border:1px solid gray;width:8;height:0;"></div>');
-        w('<div style="position:absolute;left:'+(xstart-70)+';top:'+(ystart+t*stheight-7)+';width=70;height:20;border:0;padding:0;"><font size=2>'+(t/10>>0)+(t%10)+':00</font></div>');
-      }
-      w('<div id=div_time style="position:absolute;left:'+(xstart-stwidth/2-10)+';top:'+gety(0)+';border:1px solid rgba(200,0,0,0.5);width:'+(winwidth-xstart+stwidth/2)+';height:0;"></div>');   
-      </script>
+<div data-role='page' id='page_preview'>
+  <div data-role='header' data-position='fixed'>
+    <h3><span id='lbl_date'></span> Preview</h3>
+    <a href='#' id='btn_close' class='ui-btn ui-btn-icon-left ui-icon-delete'>Close</a>
+    <div data-role='controlgroup' data-type='horizontal' class='ui-btn-right'>
+      <a href='#' id='btn_prev' class='ui-btn ui-btn-icon-right ui-icon-arrow-l'>Prev</a>
+      <a href='#' id='btn_next' class='ui-btn ui-btn-icon-right ui-icon-arrow-r'>Next</a>
     </div>
   </div>
-  <script>
-  $('#btn_close').click(function(){close();});
-  $('#btn_prev').click(function(){
-    var t=date.getTime();
-    if(t>=86400000) date.setTime(t-86400000);
-    $('#lbl_date').text(date.toLocaleDateString());
-    $('.bar').remove();
-    runPrograms();
-  });
-  $('#btn_next').click(function(){
-    date.setTime(date.getTime()+86400000);
-    $('#lbl_date').text(date.toLocaleDateString());
-    $('.bar').remove();
-    runPrograms();
-  });
-  $('#page_preview').on('pagebeforeshow', function(){
-    var ss=window.location.search.split('date=');
-    if(ss.length==2) {
-      date=new Date(ss[1]);
+  <div id='div_plot' data-role='content'>
+    <script>
+    var date,tmz=0,intv=15,devday=0,progs;
+    var xstart=80,ystart=80,stwidth=100,stheight=120,nzones=3;
+    var winwidth=stwidth*nzones+xstart, winheight=24.5*stheight+ystart;
+    var prog_color=['rgba(0,0,200,0.3)','rgba(0,200,0,0.3)','rgba(200,0,0,0.3)','rgba(0,200,200,0.3)'];
+    function loct()   {return date.getTime()+(tmz-48)*900000;}
+    function getx(zid)  {return xstart+zid*stwidth-15;}  // x coordinate given a zone
+    function gety(t)    {return ystart+t*stheight/60;}  // y coordinate given a time
+    function w(s) {document.write(s);}
+    function plot_bar(zid,start,pid,end) { // plot program bar
+      $('#div_plot').append('<div class=bar align=center style="position:absolute;background-color:'+prog_color[(pid+3)%4]+';left:'+getx(zid)+';top:'+gety(start/60)+';border:0;width:'+stwidth+';height:'+((end-start)/60*stheight/60)+'">P'+(pid+1)+'</div>');
     }
-    if((!date) || isNaN(date.getTime())) date=new Date();
-    $.ajax('/jp', {async:false, dataType:'json', success: function(jdata) {
-      tmz=jdata.tmz;
-      progs=jdata.progs;
-      devday=((new Date().getTime())+(tmz-48)*900000)/86400000>>0;
-      if(!progs) return;
-    }});
-    $('#lbl_date').text(date.toLocaleDateString());
-    drawTime();
-    setInterval('drawTime()', intv*1000);
-  });
-  $('#page_preview').on('pageshow', function() {
-    //window.scrollTo(0,100);
-    runPrograms();
-  });
-  function drawTime() {
-    $('#div_time').css('top',gety(((loct()/1000)%86400)/60));
+    var zid,t;
+    for(zid=0;zid<=nzones;zid++) {
+      if(zid<nzones) w('<div style="position:absolute;left:'+(xstart+zid*stwidth+15)+';top:'+(ystart-25)+';width:'+stwidth+';height:20;border:0;padding:0;"><font size=2>Zone '+(zid+1)+'</font></div>');
+      w('<div style="position:absolute;left:'+getx(zid)+';top:'+(ystart-10)+';border:1px solid gray;width:0;height:'+(winheight-ystart+30)+';"></div>');
+    }
+    // horizontal grid, time
+    for(t=0;t<=24;t++) {
+      w('<div style="position:absolute;left:'+(xstart-30)+';top:'+gety(t*60)+';border:1px solid gray;width:15;height:0;"></div>');
+      w('<div style="position:absolute;left:'+(xstart-23)+';top:'+(gety(t*60)+stheight/2)+';border:1px solid gray;width:8;height:0;"></div>');
+      w('<div style="position:absolute;left:'+(xstart-70)+';top:'+(ystart+t*stheight-7)+';width=70;height:20;border:0;padding:0;"><font size=2>'+(t/10>>0)+(t%10)+':00</font></div>');
+    }
+    w('<div id=div_time style="position:absolute;left:'+(xstart-stwidth/2-10)+';top:'+gety(0)+';border:1px solid rgba(200,0,0,0.5);width:'+(winwidth-xstart+stwidth/2)+';height:0;"></div>');
+    </script>
+  </div>
+</div>
+<script>
+$('#btn_close').click(function(){close();});
+$('#btn_prev').click(function(){
+  var t=date.getTime();
+  if(t>=86400000) date.setTime(t-86400000);
+  $('#lbl_date').text(date.toLocaleDateString());
+  $('.bar').remove();
+  runPrograms();
+});
+$('#btn_next').click(function(){
+  date.setTime(date.getTime()+86400000);
+  $('#lbl_date').text(date.toLocaleDateString());
+  $('.bar').remove();
+  runPrograms();
+});
+$('#page_preview').on('pagebeforeshow', function(){
+  var ss=window.location.search.split('date=');
+  if(ss.length==2) {
+    date=new Date(ss[1]);
   }
-  function checkDayMatch(prog,simt) {
-    var conf=prog.config;
-    var dayt=(conf>>1)&1,oddeven=(conf>>2)&3;
-    var days=[(conf>>8)&0xff,(conf>>16)&0xff];
-    var wd=(date.getDay()+6)%7;
-    if(dayt==1) { // interval
-      if (((simt/86400>>0)%days[1]) != ((days[0]+devday)%days[1])) return 0;
-    } else { // weekly
-      if (!(days[0] & (1<<wd))) return 0;
-    }
-    var dt=date.getDate();
-    if(oddeven==2) { // even
-      if(dt%2) return 0;
-    } else if(oddeven==1) { // odd
-      if(dt==31 || (dt==29&&date.getMonth()==1) || (dt%2)!=1) return 0;
-    }
-    return 1;
+  if((!date) || isNaN(date.getTime())) date=new Date();
+  $.ajax('/jp', {async:false, dataType:'json', success: function(jdata) {
+    tmz=jdata.tmz;
+    progs=jdata.progs;
+    devday=((new Date().getTime())+(tmz-48)*900000)/86400000>>0;
+    if(!progs) return;
+  }});
+  $('#lbl_date').text(date.toLocaleDateString());
+  drawTime();
+  setInterval('drawTime()', intv*1000);
+});
+$('#page_preview').on('pageshow', function() {
+  //window.scrollTo(0,100);
+  runPrograms();
+});
+function drawTime() {
+  $('#div_time').css('top',gety(((loct()/1000)%86400)/60));
+}
+function checkDayMatch(prog,simt) {
+  var conf=prog.config;
+  var dayt=(conf>>1)&1,oddeven=(conf>>2)&3;
+  var days=[(conf>>8)&0xff,(conf>>16)&0xff];
+  var wd=(date.getDay()+6)%7;
+  if(dayt==1) { // interval
+    if (((simt/86400>>0)%days[1]) != ((days[0]+devday)%days[1])) return 0;
+  } else { // weekly
+    if (!(days[0] & (1<<wd))) return 0;
   }
-  function checkMatch(prog,simt) {
-    if(!(prog.config&1)) return 0;
-    var stt=(prog.config>>4)&3,i;
-    var curr=(simt%86400)/60>>0;
-    var sts=prog.sts;
-    var start=sts[0],repeat=sts[1],interval=sts[2];
-    if(checkDayMatch(prog,simt)) {
-      if(stt==0) { return (curr==start)?1:0;}
-      else if(stt==1) {
-        for(i=0;i<5;i++) {
-          if(curr==sts[i]) return 1;
-        }
-      } else if(stt==2) {
-        if(curr==start) return 1;
-        if (curr>start && interval) {
-          var c = (curr-start)/interval>>0;
-          if ((c*interval==(curr-start)) && c<=repeat) {
-            return 1;
-          }
-        }
+  var dt=date.getDate();
+  if(oddeven==2) { // even
+    if(dt%2) return 0;
+  } else if(oddeven==1) { // odd
+    if(dt==31 || (dt==29&&date.getMonth()==1) || (dt%2)!=1) return 0;
+  }
+  return 1;
+}
+function checkMatch(prog,simt) {
+  if(!(prog.config&1)) return 0;
+  var stt=(prog.config>>4)&3,i;
+  var curr=(simt%86400)/60>>0;
+  var sts=prog.sts;
+  var start=sts[0],repeat=sts[1],interval=sts[2];
+  if(checkDayMatch(prog,simt)) {
+    if(stt==0) { return (curr==start)?1:0;}
+    else if(stt==1) {
+      for(i=0;i<5;i++) {
+        if(curr==sts[i]) return 1;
       }
-    }
-    if(stt!=2 || !interval) return 0;
-    if (checkDayMatch(prog,simt-86400)) {
-      var c = (curr-start+1440)/interval;
-      if ((c*interval==(curr-start+1440)) && c<=repeat) {
-        return 1;
-      }
-    }
-    return 0;    
-  }
-  function plotProgram(prog,pid,simmin) {
-    var runtime=0,start=simmin*60,end,dur,zbits;
-    for(var ti=0;ti<prog.nt;ti++) {
-      zbits=prog.pt[ti]&0xff;
-      dur=prog.pt[ti]>>8;
-      end=start+dur;
-      for(var zi=0;zi<3;zi++) {
-        if((zbits>>zi)&1) plot_bar(zi,start,pid,end);
-      }
-      start=end;
-      runtime+=dur;
-    }
-    return runtime;
-  }
-  function runPrograms() {
-    var simmin=0,simt,busy,pid,match_found=0;
-    do {
-      busy=0;
-      match_found=0;
-      for(pid=0;pid<progs.length;pid++) {
-        var prog=progs[pid];
-        simt=(loct()/86400000>>0)*86400+simmin*60;
-        if(checkMatch(prog,simt)) {
-          match_found=1;
-          var progress = plotProgram(prog,pid,simmin)/60>>0;
-          simmin+=(progress>0)?progress:1;
+    } else if(stt==2) {
+      if(curr==start) return 1;
+      if (curr>start && interval) {
+        var c = (curr-start)/interval>>0;
+        if ((c*interval==(curr-start)) && c<=repeat) {
+          return 1;
         }
       }
-      if(!match_found) simmin++;
-    } while(simmin<24*60); // simulation ends
+    }
   }
-  </script>
+  if(stt!=2 || !interval) return 0;
+  if (checkDayMatch(prog,simt-86400)) {
+    var c = (curr-start+1440)/interval;
+    if ((c*interval==(curr-start+1440)) && c<=repeat) {
+      return 1;
+    }
+  }
+  return 0;
+}
+function plotProgram(prog,pid,simmin) {
+  var runtime=0,start=simmin*60,end,dur,zbits;
+  for(var ti=0;ti<prog.nt;ti++) {
+    zbits=prog.pt[ti]&0xff;
+    dur=prog.pt[ti]>>8;
+    end=start+dur;
+    for(var zi=0;zi<3;zi++) {
+      if((zbits>>zi)&1) plot_bar(zi,start,pid,end);
+    }
+    start=end;
+    runtime+=dur;
+  }
+  return runtime;
+}
+function runPrograms() {
+  var simmin=0,simt,busy,pid,match_found=0;
+  do {
+    busy=0;
+    match_found=0;
+    for(pid=0;pid<progs.length;pid++) {
+      var prog=progs[pid];
+      simt=(loct()/86400000>>0)*86400+simmin*60;
+      if(checkMatch(prog,simt)) {
+        match_found=1;
+        var progress = plotProgram(prog,pid,simmin)/60>>0;
+        simmin+=(progress>0)?progress:1;
+      }
+    }
+    if(!match_found) simmin++;
+  } while(simmin<24*60); // simulation ends
+}
+</script>
 </body>

@@ -1,75 +1,75 @@
 <head>
-  <title>OSBeeWiFi</title>
-  <meta name='viewport' content='width=device-width, initial-scale=1'>
-  <link rel='stylesheet' href='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' />
-  <script src='http://code.jquery.com/jquery-1.9.1.min.js'></script>
-  <script src='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js'></script>
+<title>OSBeeWiFi</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<link rel='stylesheet' href='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' />
+<script src='http://code.jquery.com/jquery-1.9.1.min.js'></script>
+<script src='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js'></script>
 </head>
 <body>
-  <div data-role='page' id='page_log'>
-    <div data-role='header'><h3 id='l_name'>Log</h3>
-    <a data-role='button' id='btn_close' data-theme='a' data-icon='delete' data-iconpos='left' class='ui-btn-left'>Close</a>
-    </div>
-    <div data-role='content'>
-      <p>Below are the most recent <label id='l_nr'></label> watering records</p>
-      <p>Current time is <label id='l_time'></label></p>
-      <div data-role='fieldcontain'>
-        <table id='tab_log' border='1' cellpadding='6' style='border-collapse:collapse;'>
-          <tr><td align='center'><b>Time</b></td><td align='center'><b>Zone</b></td><td align='center'><b>Event</b></td></tr>
-        </table>
-      </div>
-    </div>
-    <div data-role='footer' data-theme='c'>
-      <p style='font-weight:normal;'>&copy; OpenSprinkler Bee (<a href='http://bee.opensprinkler.com' target='_blank' style='text-decoration:none'>bee.opensprinkler.com</a>)</p>
-    </div>   
-    <script>
-      var curr_time=0,ti=0;
-      var jd;
-      $('#btn_close').click(function(){close();});
-      $('#page_log').on('pagebeforeshow', function(){
-        curr_time = (new Date()).getTime();
-        show_time();
-        show_log();
-        if(!ti) ti=setInterval('show_time()', 1000);
-      });
-      function show_time() {
-        $('#l_time').text((new Date(curr_time)).toLocaleString());
-        curr_time += 1000;
-      }
-      function toHMS(t) {
-        var h=t/3600>>0;
-        var m=(t%3600)/60>>0;
-        var s=t%60;
-        return ''+(h/10>>0)+(h%10)+':'+(m/10>>0)+(m%10)+':'+(s/10>>0)+(s%10);
-      }
-      function show_log() {
-        $.getJSON('jl', function(jd) {
-          $('#l_name').text(jd.name);
-          $('#tab_log').find('tr:gt(0)').remove();
-          var logs=jd.logs;
-          logs.sort(function(a,b){return b[0]-a[0];});
-          $('#l_nr').text(logs.length);
-          var ldate = new Date();
-          for(var i=0;i<logs.length;i++) {
-            var l=logs[i];
-            ldate.setTime(l[0]*1000);
-            var r='<tr><td align=center>'+ldate.toLocaleString()+'</td><td>'+jd.zons[l[3]]+'</td><td>';
-            if(l[2]=='o'.charCodeAt()) {
-              r+='<b>ON</b> with Prog ';
-              r+=((l[4]>64)?String.fromCharCode(l[4]):l[4]+1)+', Task ';
-              r+=(l[5]+1)+'</td></tr>';
-            }
-            else if(l[2]=='c'.charCodeAt()) {
-              r+='Off --> ran for ';
-              r+=toHMS(l[1]);
-              r+='</td></tr>';              
-            }
-            $('#tab_log').append(r);
-          }
-        });
-        setTimeout(show_log, 15000);
-      }
-    </script>
+<div data-role='page' id='page_log'>
+  <div data-role='header'><h3 id='l_name'>Log</h3>
+  <a data-role='button' id='btn_close' data-theme='a' data-icon='delete' data-iconpos='left' class='ui-btn-left'>Close</a>
   </div>
+  <div data-role='content'>
+    <p>Below are the most recent <label id='l_nr'></label> watering records</p>
+    <p>Current time is <label id='l_time'></label></p>
+    <div data-role='fieldcontain'>
+      <table id='tab_log' border='1' cellpadding='6' style='border-collapse:collapse;'>
+        <tr><td align='center'><b>Time</b></td><td align='center'><b>Zone</b></td><td align='center'><b>Event</b></td></tr>
+      </table>
+    </div>
+  </div>
+  <div data-role='footer' data-theme='c'>
+    <p style='font-weight:normal;'>&copy; OpenSprinkler Bee (<a href='http://bee.opensprinkler.com' target='_blank' style='text-decoration:none'>bee.opensprinkler.com</a>)</p>
+  </div>   
+  <script>
+    var curr_time=0,ti=0;
+    var jd;
+    $('#btn_close').click(function(){close();});
+    $('#page_log').on('pagebeforeshow', function(){
+      curr_time = (new Date()).getTime();
+      show_time();
+      show_log();
+      if(!ti) ti=setInterval('show_time()', 1000);
+    });
+    function show_time() {
+      $('#l_time').text((new Date(curr_time)).toLocaleString());
+      curr_time += 1000;
+    }
+    function toHMS(t) {
+      var h=t/3600>>0;
+      var m=(t%3600)/60>>0;
+      var s=t%60;
+      return ''+(h/10>>0)+(h%10)+':'+(m/10>>0)+(m%10)+':'+(s/10>>0)+(s%10);
+    }
+    function show_log() {
+      $.getJSON('jl', function(jd) {
+        $('#l_name').text(jd.name);
+        $('#tab_log').find('tr:gt(0)').remove();
+        var logs=jd.logs;
+        logs.sort(function(a,b){return b[0]-a[0];});
+        $('#l_nr').text(logs.length);
+        var ldate = new Date();
+        for(var i=0;i<logs.length;i++) {
+          var l=logs[i];
+          ldate.setTime(l[0]*1000);
+          var r='<tr><td align=center>'+ldate.toLocaleString()+'</td><td>'+jd.zons[l[3]]+'</td><td>';
+          if(l[2]=='o'.charCodeAt()) {
+            r+='<b>ON</b> with Prog ';
+            r+=((l[4]>64)?String.fromCharCode(l[4]):l[4]+1)+', Task ';
+            r+=(l[5]+1)+'</td></tr>';
+          }
+          else if(l[2]=='c'.charCodeAt()) {
+            r+='Off --> ran for ';
+            r+=toHMS(l[1]);
+            r+='</td></tr>';
+          }
+          $('#tab_log').append(r);
+        }
+      });
+      setTimeout(show_log, 15000);
+    }
+  </script>
+</div>
 </body>
 

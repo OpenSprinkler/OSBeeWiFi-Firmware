@@ -24,7 +24,7 @@
 #define _DEFINES_H
 
 /** Firmware version, hardware version, and maximal values */
-#define OSB_FWV    100    // Firmware version: 100 means 1.0.0
+#define OSB_FWV    101    // Firmware version: 100 means 1.0.0
 
 /** GPIO pins */
 #define PIN_VER_DETECT 10	// Version detection pin
@@ -32,14 +32,14 @@
 #define PIN_BSTPWR    15
 
 // Version 2 pin defines
-#define V2_PIN_BSTEN   16	// Boost converter enable
-#define V2_PIN_COM     2	// COM
-#define V2_PIN_ZS0     12	// Zone switch 0
-#define V2_PIN_ZS1     13	// Zone switch 1
-#define V2_PIN_ZS2     14	// Zone switch 2
+#define V2_PIN_BSTEN   16 // Boost converter enable
+#define V2_PIN_COM     2  // COM
+#define V2_PIN_ZS0     12 // Zone switch 0
+#define V2_PIN_ZS1     13 // Zone switch 1
+#define V2_PIN_ZS2     14 // Zone switch 2
 
 // Version 3 pin defines
-#define V3_PIN_BSTNEN  16	// Boost converter enable (Active-Low)
+#define V3_PIN_BSTNEN  16 // Boost converter enable (Active-Low)
 #define V3_PIN_SR_LAT  12 // v3 uses 74HC595 shift register, this is latch pin
 
 // Default device name
@@ -98,13 +98,15 @@ typedef enum {
   OPTION_SSID,    // wifi ssid
   OPTION_PASS,    // wifi password
   OPTION_AUTH,    // authentication token
+  OPTION_CDMN,    // cloud server domain name
+  OPTION_CPRT,    // cloud server port number
   OPTION_DKEY,    // device key
   OPTION_NAME,    // device name
   OPTION_ZON0,    // zone 1 name
   OPTION_ZON1,    // zone 2 name
   OPTION_ZON2,    // zone 3 name
-  OPTION_BSVO,		// boosted voltage for opening
-  OPTION_BSVC,		// boosted voltage for closing
+  OPTION_BSVO,    // boosted voltage for opening
+  OPTION_BSVC,    // boosted voltage for closing
   NUM_OPTIONS     // number of options
 } OSB_OPTION_enum;
 
