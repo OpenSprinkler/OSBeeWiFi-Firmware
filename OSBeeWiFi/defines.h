@@ -24,7 +24,7 @@
 #define _DEFINES_H
 
 /** Firmware version, hardware version, and maximal values */
-#define OSB_FWV    101    // Firmware version: 100 means 1.0.0
+#define OSB_FWV    102    // Firmware version: 102 means 1.0.2
 
 /** GPIO pins */
 #define PIN_VER_DETECT 10	// Version detection pin
@@ -65,8 +65,9 @@
 #define OSB_STATE_CONNECTING     1
 #define OSB_STATE_CONNECTED      2
 #define OSB_STATE_TRY_CONNECT    3
+#define OSB_STATE_WAIT_RESTART   4
+#define OSB_STATE_WIFIRESET      8
 #define OSB_STATE_RESET          9
-#define OSB_STATE_RESTART        10
 
 #define MAX_NUMBER_ZONES         3
 
@@ -87,7 +88,14 @@
 #define QUICK_PROGRAM_INDEX       'Q' // 81
 #define TESTZONE_PROGRAM_INDEX    'T' // 84
 
-#define MIN_EPOCH_TIME  978307200
+#define DEFAULT_NTP1    "time.google.com"
+#define DEFAULT_NTP2    "time.cloudflare.com"
+#define DEFAULT_NTP3    "time.windows.com"
+#define MIN_EPOCH_TIME  1577836800UL
+
+#define CLD_NONE    0
+#define CLD_BLYNK   1
+#define CLD_OTC     2
 
 typedef enum {
   OPTION_FWV = 0, // firmware version
@@ -97,6 +105,7 @@ typedef enum {
   OPTION_MOD,     // mode
   OPTION_SSID,    // wifi ssid
   OPTION_PASS,    // wifi password
+  OPTION_CLD,     // cloud option
   OPTION_AUTH,    // authentication token
   OPTION_CDMN,    // cloud server domain name
   OPTION_CPRT,    // cloud server port number
@@ -107,6 +116,7 @@ typedef enum {
   OPTION_ZON2,    // zone 3 name
   OPTION_BSVO,    // boosted voltage for opening
   OPTION_BSVC,    // boosted voltage for closing
+  OPTION_DIM,     // LCD dimming when idling
   NUM_OPTIONS     // number of options
 } OSB_OPTION_enum;
 
@@ -118,7 +128,10 @@ typedef enum {
   NUM_DISP_MODES
 } OSB_DISP_enum;
 
-#define BUTTON_RESET_TIMEOUT  4000  // if button is pressed for at least 5 seconds, reset
+#define BUTTON_WIFIRESET_TIMEOUT   3000 // if button is pressed for at least 3 seconds, WiFi reset
+#define BUTTON_FACRESET_TIMEOUT    5000  // if button is pressed for at least 5 seconds, factory reset
+#define LCD_DIMMING_TIMEOUT 15 // dim LCD after 15 seconds of no button click
+
 #define LED_FAST_BLINK 100
 #define LED_SLOW_BLINK 500
 

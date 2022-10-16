@@ -1,3 +1,59 @@
+const char ap_update_html[] PROGMEM = R"(<head>
+<title>OSBeeWiFi</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+</head>
+<body>
+<div id='page_update'>
+<div><h3>OSBeeWiFi AP-mode Firmware Update</h3></div>
+<div>
+<form method='POST' action='/update' id='fm' enctype='multipart/form-data'>
+<table cellspacing=4>
+<tr><td><input type='file' name='file' accept='.bin' id='file'></td></tr>
+<tr><td><b>Device key: </b><input type='password' name='dkey' size=16 maxlength=64 id='dkey'></td></tr>
+<tr><td><label id='msg'></label></td></tr>
+</table>
+<button id='btn_submit' style='height:48px;'>Submit</a>
+</form>
+</div>
+</div>
+<script>
+function id(s) {return document.getElementById(s);}
+function clear_msg() {id('msg').innerHTML='';}
+function show_msg(s,t,c) {
+id('msg').innerHTML=s.fontcolor(c);
+if(t>0) setTimeout(clear_msg, t);
+}
+id('btn_submit').addEventListener('click', function(e){
+e.preventDefault();
+var files= id('file').files;
+if(files.length==0) {show_msg('Please select a file.',2000,'red'); return;}
+if(id('dkey').value=='') {
+if(!confirm('You did not input a device key. Are you sure?')) return;
+}
+show_msg('Uploading. Please wait...',0,'green');
+var fd = new FormData();
+var file = files[0];
+fd.append('file', file, file.name);
+fd.append('dkey', id('dkey').value);
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if(xhr.readyState==4 && xhr.status==200) {
+var jd=JSON.parse(xhr.responseText);
+if(jd.result==1) {
+show_msg('Update is successful. Rebooting. Check LCD screen for status.',0,'green');
+} else if (jd.result==2) {
+show_msg('Check device key and try again.', 5000, 'red');
+} else {
+show_msg('Update failed.',0,'red');
+}
+}
+};
+xhr.open('POST', '//' + window.location.hostname + ':8080' + window.location.pathname, true);
+xhr.send(fd);
+});
+</script>
+</body>)";
+
 const char connect_html[] PROGMEM = R"(<head>
 <title>OSBeeWiFi</title>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
@@ -30,7 +86,7 @@ id('butt').onclick=function rd(){window.open('http://'+ip);}
 clearInterval(tci);
 }
 }    
-xhr.open('POST', 'jt', true); xhr.send();    
+xhr.open('POST', 'jt', true); xhr.send();
 }
 function sf() {
 id('msg').innerHTML='';
@@ -71,23 +127,23 @@ setTimeout(loadSSIDs, 1000);
 const char index_html[] PROGMEM = R"(<head>
 <title>OSBeeWiFi</title>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<link rel='stylesheet' href='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' />
-<script src='http://code.jquery.com/jquery-1.9.1.min.js'></script>
-<script src='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js'></script>
+<link rel='stylesheet' href='https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' />
+<script src='https://code.jquery.com/jquery-1.9.1.min.js'></script>
+<script src='https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js'></script>
 </head>
 <body>
 <div data-role='page' id='page_home'>
 <div data-role='header'>
 <h3 id='l_name'>OSBWiFi</h3>
-<a data-role='button' id='btn_upd' data-theme='a' data-icon='gear' data-iconpos='left' class='ui-btn-right'>Update</a>
 </div>
 <div role='main' class='ui-content'>
 <ul data-role='listview' data-divider-theme='d'>
 <li data-role='list-divider'>Status</li>
 <li>
 <table cellpadding=4 cellspacing=0>
-<tr><td colspan=2><span id='l_time'></span></td></tr>
+<tr><td colspan=2><span id='l_time'></span> <span id='l_beat'></span></td></tr>
 <tr><td><b>Valve:</b> <span id='l_sot'></span></td><td><b>WiFi:</b> <span id='l_rssi'></span></td></tr>
+<tr><td colspan=2><b>Cloud:</b> <span id='l_cld'></span></td></tr>
 </table>
 </li>
 <li data-role='list-divider'>Zones</li>
@@ -115,33 +171,28 @@ var i;
 for(i=0;i<6;i++) w('<button onclick=openprog('+i+') id=btn_p'+i+'>'+(i+1)+'</a>');
 </script>
 </div>
-<table><tr><td><button data-theme='b' id='btn_pre'>Program Preview</button></td></tr></table>
+<table><tr><td><a href='preview' data-role='button' target='_top' data-theme='b'>Program Preview</a></td></tr></table>
 </li>
 <li data-role='list-divider'>System</li>
 <li>
 <div data-role='controlgroup' data-type='horizontal'>
-<button data-theme='b' id='btn_opt'>Settings</button>
-<button data-theme='b' id='btn_man'>Manual</button>  
-<button data-theme='b' id='btn_log'>Log</button>
+<a href='settings' data-role='button' target='_top' data-theme='b'>Settings</a>
+<a href='manual' data-role='button' target='_top' data-theme='b'>Manual</a>  
+<a href='log' data-role='button' target='_top' data-theme='b'>Log</a>
 </div>
 </li>        
 </ul>
 </div>
 <div data-role='footer' data-theme='c'>
-<p>&nbsp; OSBee Firmware v<span id='l_fwv'></span> (<a href='http://bee.opensprinkler.com' target='_blank' style='text-decoration:none'>bee.opensprinkler.com</a>)</p><div data-role='controlgroup' data-type='horizontal'><a href='update.html' target='_top' data-role='button' data-inline=true data-mini=true>Firmware Update</a><a href='https://github.com/OpenSprinkler/OSBeeWiFi-Firmware/tree/master/docs' target='_blank' data-role='button' data-inline=true data-mini=true>User Manual</a></p></div>
+<p>&nbsp; OSBee Firmware v<span id='l_fwv'></span> (<a href='http://bee.opensprinkler.com' target='_blank' style='text-decoration:none'>bee.opensprinkler.com</a>)</p><div data-role='controlgroup' data-type='horizontal'><a href='update' target='_top' data-role='button' data-inline=true data-mini=true>Firmware Update</a><a href='https://github.com/OpenSprinkler/OSBeeWiFi-Firmware/tree/master/docs' target='_blank' data-role='button' data-inline=true data-mini=true>User Manual</a></p></div>
 </div>
 <script>
-$('#btn_man').click(function(e){window.open('manual.html');});
-$('#btn_log').click(function(e){window.open('log.html');});
-$('#btn_upd').click(function(e){window.open('update.html');});
-$('#btn_opt').click(function(e){window.open('settings.html');});
-$('#btn_pre').click(function(e){window.open('preview.html');})
 var nprogs=0,ntasks=0,prem=0,trem=0,utct=0,zbits=0,si=0,ti=0;
 function openprog(i){
 if(i<nprogs) {
-window.open('program.html?pid='+i);
+window.open('program?pid='+i,'_top');
 } else {
-window.open('program.html?pid=-1');
+window.open('program?pid=-1','_top');
 }
 }    
 $('#page_home').on('pagebeforeshow', function() {
@@ -175,8 +226,12 @@ else if(utct>0){
 $('#l_time').text((new Date(utct*1000)).toLocaleString());
 }
 }    
-function updateSystem(jd) {
-$.getJSON('jc', function(jd) {
+function updateSystem() {
+$.ajax({
+url:'jc',
+dataType:'JSON',
+timeout:5000,
+success:function(jd){
 utct=jd.utct;
 prem=jd.prem;
 trem=jd.trem;
@@ -200,13 +255,22 @@ $('#l_tid').text(''+(jd.tid+1)+'/'+(ntasks));
 $('#l_pid').text(jd.pid>64?String.fromCharCode(jd.pid):(jd.pid+1));
 $('#b_status').show();
 }
+if(jd.cld==0) $('#l_cld').text('None');
+else if(jd.cld==1) {$('#l_cld').text('Blynk '+['(disconnected)','(connected)'][jd.clds]);}
+else {$('#l_cld').text('OTC '+['(not enabled)','(connecting...)','(disconnected)','(connected)'][jd.clds]);}
 var i,btn;
 for(i=0;i<jd.mnp;i++) {
 btn=$('#btn_p'+i);
 if(i<nprogs) {btn.button('enable');btn.button({theme:'b'});}
 else if(i==nprogs) {btn.button('enable');btn.button({theme:'a'});}
 else {btn.button('disable');btn.button({theme:'c'});}
-}          
+}
+$('#l_beat').text('(online)').css('color','black');
+},
+error:function(){
+$('#l_beat').text('(offline)').css('color','red');
+$('#l_cld').text('disconnected');
+}
 });
 }
 </script>
@@ -216,14 +280,14 @@ else {btn.button('disable');btn.button({theme:'c'});}
 const char log_html[] PROGMEM = R"(<head>
 <title>OSBeeWiFi</title>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<link rel='stylesheet' href='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' />
-<script src='http://code.jquery.com/jquery-1.9.1.min.js'></script>
-<script src='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js'></script>
+<link rel='stylesheet' href='https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' />
+<script src='https://code.jquery.com/jquery-1.9.1.min.js'></script>
+<script src='https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js'></script>
 </head>
 <body>
 <div data-role='page' id='page_log'>
 <div data-role='header'><h3 id='l_name'>Log</h3>
-<a data-role='button' id='btn_close' data-theme='a' data-icon='delete' data-iconpos='left' class='ui-btn-left'>Close</a>
+<a data-role='button' data-rel='back' data-theme='a' data-icon='back' data-iconpos='left' class='ui-btn-left'>Back</a>
 </div>
 <div data-role='content'>
 <p>Below are the most recent <label id='l_nr'></label> watering records</p>
@@ -240,7 +304,6 @@ const char log_html[] PROGMEM = R"(<head>
 <script>
 var curr_time=0,ti=0;
 var jd;
-$('#btn_close').click(function(){close();});
 $('#page_log').on('pagebeforeshow', function(){
 curr_time = (new Date()).getTime();
 show_time();
@@ -277,7 +340,7 @@ r+=(l[5]+1)+'</td></tr>';
 else if(l[2]=='c'.charCodeAt()) {
 r+='Off --> ran for ';
 r+=toHMS(l[1]);
-r+='</td></tr>';              
+r+='</td></tr>';
 }
 $('#tab_log').append(r);
 }
@@ -291,14 +354,14 @@ setTimeout(show_log, 15000);
 const char manual_html[] PROGMEM = R"(<head>
 <title>OSBeeWiFi</title>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<link rel='stylesheet' href='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' />
-<script src='http://code.jquery.com/jquery-1.9.1.min.js'></script>
-<script src='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js'></script>
+<link rel='stylesheet' href='https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' />
+<script src='https://code.jquery.com/jquery-1.9.1.min.js'></script>
+<script src='https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js'></script>
 </head>
 <body>
 <div data-role='page' id='page_manual'>
 <div data-role='header'><h3>Manual Control</h3>
-<a data-role='button' id='btn_close' data-theme='a' data-icon='delete' data-iconpos='left' class='ui-btn-left'>Close</a>
+<a data-role='button' data-rel='back' data-theme='a' data-icon='back' data-iconpos='left' class='ui-btn-left'>Back</a>
 </div>
 <div data-role='content'>
 <fieldset data-role='controlgroup' data-type='horizontal'>
@@ -352,6 +415,7 @@ return e;
 }
 function clear_msg() {$('#msg').text('');}  
 function show_msg(s,c) {$('#msg').text(s).css('color',c); setTimeout(clear_msg, 3000);}
+function goback() {history.back();}
 function eval_cb(n) {
 return $(n).is(':checked')?1:0;
 }
@@ -366,12 +430,10 @@ $('#div_quickprog').hide();
 if(eval_cb('#testzone')) $('#div_testzone').show();
 if(eval_cb('#quickprog')) $('#div_quickprog').show();
 }
-$('#btn_close').click(function(){close();});
 $(':button').click(function(e){
 e.preventDefault();
 var id=e.target.id;
 var comm;
-if(id==='btn_close') {close();return;}
 if(id==='btn_submit') {
 comm='rp?dkey='+encodeURIComponent($('#dkey').val());
 if(eval_cb('#testzone')) {
@@ -389,12 +451,12 @@ comm+=(i==2)?']':',';
 }
 }
 } else if(id==='btn_reset') {
-comm='cc?dkey='+encodeURIComponent($('#dkey').val());        
+comm='cc?dkey='+encodeURIComponent($('#dkey').val());
 if(!confirm('Stop all zones?')) return;
 else comm+='&reset=1';
 } else if(id==='btn_reboot') {
-comm='cc?dkey='+encodeURIComponent($('#dkey').val());                
-if(!confirm('Reboot controller?')) return;    
+comm='cc?dkey='+encodeURIComponent($('#dkey').val());
+if(!confirm('Reboot controller?')) return;
 else comm+='&reboot=1';
 }
 $.getJSON(comm, function(jd) {
@@ -402,8 +464,8 @@ if(jd.result!=1) {
 if(jd.result==2) show_msg('Check device key and try again.','red');
 else show_msg('Error: '+err_msg(jd.result)+', item: '+jd.item+'.','red');
 } else {
-if(id=='btn_reboot') {show_msg('Rebooting...','green');setTimeout(close,2000);}
-else {show_msg('Submitted successfully!','green');setTimeout(close,2000);}
+if(id=='btn_reboot') {show_msg('Rebooting...','green');setTimeout(goback,10000);}
+else {show_msg('Submitted successfully!','green');setTimeout(goback,2000);}
 }
 });
 });
@@ -422,18 +484,18 @@ $(this).find('.ui-slider').width(300);
 const char preview_html[] PROGMEM = R"(<head>
 <title>Program Preview</title>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
-<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 </head>
 <body>
 <div data-role='page' id='page_preview'>
 <div data-role='header' data-position='fixed'>
 <h3><span id='lbl_date'></span> Preview</h3>
-<a href='#' id='btn_close' class='ui-btn ui-btn-icon-left ui-icon-delete'>Close</a>
+<a href='#' data-rel='back' class='ui-btn ui-btn-icon-left ui-icon-back'>Back</a>
 <div data-role='controlgroup' data-type='horizontal' class='ui-btn-right'>
-<a href='#' id='btn_prev' class='ui-btn ui-btn-icon-right ui-icon-arrow-l'>Prev</a>
-<a href='#' id='btn_next' class='ui-btn ui-btn-icon-right ui-icon-arrow-r'>Next</a>   
+<a href='#' id='btn_prev' class='ui-btn ui-btn-icon-left ui-icon-arrow-l'>Prev</a>
+<a href='#' id='btn_next' class='ui-btn ui-btn-icon-right ui-icon-arrow-r'>Next</a>
 </div>
 </div>
 <div id='div_plot' data-role='content'>
@@ -460,12 +522,11 @@ w('<div style="position:absolute;left:'+(xstart-30)+';top:'+gety(t*60)+';border:
 w('<div style="position:absolute;left:'+(xstart-23)+';top:'+(gety(t*60)+stheight/2)+';border:1px solid gray;width:8;height:0;"></div>');
 w('<div style="position:absolute;left:'+(xstart-70)+';top:'+(ystart+t*stheight-7)+';width=70;height:20;border:0;padding:0;"><font size=2>'+(t/10>>0)+(t%10)+':00</font></div>');
 }
-w('<div id=div_time style="position:absolute;left:'+(xstart-stwidth/2-10)+';top:'+gety(0)+';border:1px solid rgba(200,0,0,0.5);width:'+(winwidth-xstart+stwidth/2)+';height:0;"></div>');   
+w('<div id=div_time style="position:absolute;left:'+(xstart-stwidth/2-10)+';top:'+gety(0)+';border:1px solid rgba(200,0,0,0.5);width:'+(winwidth-xstart+stwidth/2)+';height:0;"></div>');
 </script>
 </div>
 </div>
 <script>
-$('#btn_close').click(function(){close();});
 $('#btn_prev').click(function(){
 var t=date.getTime();
 if(t>=86400000) date.setTime(t-86400000);
@@ -549,7 +610,7 @@ if ((c*interval==(curr-start+1440)) && c<=repeat) {
 return 1;
 }
 }
-return 0;    
+return 0;
 }
 function plotProgram(prog,pid,simmin) {
 var runtime=0,start=simmin*60,end,dur,zbits;
@@ -588,9 +649,9 @@ if(!match_found) simmin++;
 const char program_html[] PROGMEM = R"(<head>
 <title>Edit Program</title>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<link rel='stylesheet' href='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' />
-<script src='http://code.jquery.com/jquery-1.9.1.min.js'></script>
-<script src='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js'></script>
+<link rel='stylesheet' href='https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' />
+<script src='https://code.jquery.com/jquery-1.9.1.min.js'></script>
+<script src='https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js'></script>
 <style>
 table td, table th { padding: 2; }
 </style>
@@ -622,7 +683,7 @@ function w(s) {document.write(s);}
 var s=['M','Tu','W','Th','F','Sa','Su'];
 for(i=0;i<7;i++) {
 w('<input type=checkbox data-mini=true id=wd'+i+'>');
-w('<label for=wd'+i+'>'+s[i]+'</label>');     
+w('<label for=wd'+i+'>'+s[i]+'</label>');
 }
 </script>
 </fieldset>
@@ -728,13 +789,14 @@ if(e===3) return 'mismatch';
 if(e===16) return 'missing data';
 if(e===17) return 'out of bound';
 return e;
-}  
+}
+function goback() {history.back();}
 function show_result(jd,m,t) {
 if(jd.result==2) show_msg('Device key is incorrect!');
 else if(jd.result!=1) show_msg('Error: '+err_msg(jd.result)+', item: '+jd.item+'.');
 else {
 $('#msg').html('<font color=green>'+m+'</font>');
-if(t>0) setTimeout(close, t);
+if(t>0) setTimeout(goback, t);
 }
 }
 var selected = -1;
@@ -919,7 +981,7 @@ $('#st'+i+'m').val('-');
 }
 }
 $('#btn_cancel').click(function(){
-if(confirm('Quit editing this program?')) close();
+if(confirm('Quit editing this program?')) goback();
 });
 $('#btn_submit').click(function(){
 if($('#name').val().length==0) {show_msg('Program name is empty!');return;}
@@ -1048,14 +1110,14 @@ event.preventDefault();
 const char settings_html[] PROGMEM = R"(<head>
 <title>OSBeeWiFi Options</title>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<link rel='stylesheet' href='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' type='text/css'>
-<script src='http://code.jquery.com/jquery-1.9.1.min.js' type='text/javascript'></script>
-<script src='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js' type='text/javascript'></script>
+<link rel='stylesheet' href='https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' type='text/css'>
+<script src='https://code.jquery.com/jquery-1.9.1.min.js' type='text/javascript'></script>
+<script src='https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js' type='text/javascript'></script>
 </head>
 <body>
 <div data-role='page' id='page_opts'>
 <div data-role='header'><h3>Edit Options</h3>
-<a data-role='button' id='btn_cancel' data-theme='a' data-icon='delete' data-iconpos='left' class='ui-btn-left'>Cancel</a>
+<a data-role='button' data-rel='back' data-theme='a' data-icon='back' data-iconpos='left' class='ui-btn-left'>Back</a>
 </div>    
 <div data-role='content'>   
 <table cellpadding=2>
@@ -1079,9 +1141,14 @@ w('<option value='+i+'>GMT'+tzname+'</option>');
 for(i=0;i<3;i++)
 w('<tr><td><b>Zone'+(i+1)+' Name:</b></td><td><input type=text size=20 maxlength=32 id=zon'+i+' data-mini=true value="Zone '+(i+1)+'"></td></tr>');
 </script>
-<tr><td><b>Cloud Token:</b></td><td><input type='text' size=32 maxlength=32 id='auth' data-mini='true' value='-'></td></tr>
-<tr><td><b>Cloud Server:</b></td><td><input type='text' size=32 maxlength=64 id='cdmn' data-mini='true' value='blynk.openthings.io'></td></tr>
-<tr><td><b>Cloud Port:</b></td><td><input type='text' size=5 maxlength=5 id='cprt' data-mini='true' value='8080'></td></tr>
+<tr><td><b>Cloud Type:</b></td><td><fieldset data-role='controlgroup' data-mini='true' data-type='horizontal'>
+<input type='radio' name='rd_cld' id='cld0' onclick='update_ct()' checked><label for='cld0'>None</label>
+<input type='radio' name='rd_cld' id='blynk' onclick='update_ct()'><label for='blynk'>Blynk</label>
+<input type='radio' name='rd_cld' id='otc' onclick='update_ct()'><label for='otc'>OTC</label>
+</fieldset></td></tr>
+<tr class='cld' hidden><td><b>Cloud Token:</b></td><td><input type='text' size=20 maxlength=64 id='auth' data-mini='true'></td></tr>
+<tr class='cld' hidden><td><b>Cloud Server:</b></td><td><input type='text' size=20 maxlength=64 id='cdmn' data-mini='true' value='blynk.openthings.io'></td></tr>
+<tr class='cld' hidden><td><b>Cloud Port:</b></td><td><input type='text' size=5 maxlength=5 id='cprt' data-mini='true' value='8080'></td></tr>
 <tr><td><b>Valve Type:</b></td><td>
 <select name='sot' id='sot' data-mini='true'>
 <option value=0>Latching (bi-stable)</option>
@@ -1089,12 +1156,14 @@ w('<tr><td><b>Zone'+(i+1)+' Name:</b></td><td><input type=text size=20 maxlength
 </select></td></tr> 
 <tr id='tr_bsvo' style='display:none;'><td><b>Boost Volt.:</b><br><small>for opening zone</small></td><td><input type='text' size=2 maxlength=2 id='bsvo' data-mini='true' placeholder='(leave blank to use default)'></td></tr>
 <tr id='tr_bsvc' style='display:none;'><td><b>Boost Volt.:</b><br><small>for closing zone</small></td><td><input type='text' size=2 maxlength=2 id='bsvc' data-mini='true' placeholder='(leave blank to use default)'></td></tr>
-<tr><td><b>HTTP Port:</b></td><td><input type='text' size=5 maxlength=5 id='htp' value=1 data-mini='true'></td></tr>
+<tr><td><b>HTTP Port:</b></td><td><input type='text' size=5 maxlength=5 id='htp' value=80 data-mini='true'></td></tr>
+<tr><td><b>LCD Dimming:</b></td><td><input type='range' id='dim' value=2 min=0 max=10></td></tr>
 <tr><td><b>Device Key:</b></td><td><input type='password' size=24 maxlength=32 id='dkey' data-mini='true'></td></tr>
 <tr><td colspan=2><p id='msg'></p></td></tr>
 </table>
 <div data-role='controlgroup' data-type='horizontal'>
-<a href='#' data-role='button' data-inline='true' data-theme='b' id='btn_submit'>Submit</a>      
+<a href='#' data-rel='back' data-role='button' data-inline='true' data-theme='a'>Cancel</a>
+<a href='#' data-role='button' data-inline='true' data-theme='b' id='btn_submit'>Submit</a>
 </div>
 <br />
 <table>
@@ -1113,14 +1182,16 @@ if(e===3) return 'mismatch';
 if(e===16) return 'missing data';
 if(e===17) return 'out of bound';
 return e;
-}    
+}
+function eval_cb(n)  {return $(n).is(':checked')?1:0;}
+function cbt(n,v=true) {$('#'+n).attr('checked',v).checkboxradio('refresh');}
+function goback() {history.back();}
 function clear_msg() {$('#msg').text('');}  
 function show_msg(s) {$('#msg').text(s).css('color','red'); setTimeout(clear_msg, 2000);}
 $('#cb_key').click(function(e){
 $('#nkey').textinput($(this).is(':checked')?'enable':'disable');
 $('#ckey').textinput($(this).is(':checked')?'enable':'disable');
 });
-$('#btn_cancel').click(function(e){ e.preventDefault(); close(); });
 function check_bsv(n) {
 let bsv=$(n).val();
 if(bsv.length>0) {
@@ -1129,6 +1200,21 @@ if(bsvi>=5 && bsvi<=21) return bsvi;
 else { show_msg('Boost voltage out of bound!'); return -1;}
 } else { return 0; }
 }
+let prev_ct=0;
+function update_ct() {
+if(eval_cb('#cld0')) {$('.cld').hide(); prev_ct=0; return;}
+else if(eval_cb('#blynk')&&prev_ct!=1) {
+$('.cld').show();
+$('#cdmn').val('blynk.openthings.io');
+$('#cprt').val(8080);
+prev_ct=1;
+} else if(eval_cb('#otc')) {
+$('.cld').show();
+$('#cdmn').val('ws.cloud.openthings.io');
+$('#cprt').val(80);
+prev_ct=2;
+}
+}
 $('#btn_submit').click(function(e){
 e.preventDefault();
 if(confirm('Submit changes?')) {
@@ -1136,6 +1222,7 @@ var comm='co?dkey='+encodeURIComponent($('#dkey').val());
 comm+='&tmz='+$('#tmz').val();
 comm+='&sot='+$('#sot').val();
 comm+='&htp='+$('#htp').val();
+comm+='&dim='+$('#dim').val();
 let volt = check_bsv('#bsvo');
 if(volt<0) return;
 else comm+='&bsvo='+volt;
@@ -1146,8 +1233,13 @@ comm+='&name='+encodeURIComponent($('#name').val());
 var i;
 for(i=0;i<3;i++) comm+='&zon'+i+'='+encodeURIComponent($('#zon'+i).val());
 comm+='&auth='+encodeURIComponent($('#auth').val());
+comm+='&cld='
+if(eval_cb('#cld0')) comm+=0;
+else {
+comm+=eval_cb('#blynk')?1:2;
 comm+='&cdmn='+encodeURIComponent($('#cdmn').val());
 comm+='&cprt='+($('#cprt').val());
+}
 if($('#cb_key').is(':checked')) {
 if(!$('#nkey').val()) {
 if(!confirm('New device key is empty. Are you sure?')) return;
@@ -1161,7 +1253,7 @@ if(jd.result==2) show_msg('Check device key and try again.');
 else show_msg('Error: '+err_msg(jd.result)+', item: '+jd.item);
 } else {
 $('#msg').html('<font color=green>Options are successfully saved. Note that<br>changes to some options may require a reboot.</font>');
-setTimeout(close, 2000);
+setTimeout(goback, 2000);
 }
 });
 }
@@ -1182,9 +1274,16 @@ if(jd.bsvc>0) $('#bsvc').val(jd.bsvc);
 $('#name').val(jd.name);
 var i;
 for(i=0;i<3;i++) $('#zon'+i).val(jd.zons[i]);
+if(jd.cld>0) {
+cbt('cld0',false);
+$('.cld').show();
+if(jd.cld==1) {cbt('blynk');cbt('otc',false);prev_ct=1;}
+if(jd.cld==2) {cbt('otc');cbt('blynk',false);prev_ct=2;}
+}
 $('#auth').val(jd.auth);
 $('#cdmn').val(jd.cdmn);
 $('#cprt').val(jd.cprt);
+$('#dim').val(jd.dim).slider('refresh');
 });
 });
 </script>
@@ -1193,22 +1292,22 @@ $('#cprt').val(jd.cprt);
 const char update_html[] PROGMEM = R"(<head>
 <title>OSBeeWiFi</title>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<link rel='stylesheet' href='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' type='text/css'>
-<script src='http://code.jquery.com/jquery-1.9.1.min.js' type='text/javascript'></script>
-<script src='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js' type='text/javascript'></script>
+<link rel='stylesheet' href='https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' type='text/css'>
+<script src='https://code.jquery.com/jquery-1.9.1.min.js' type='text/javascript'></script>
+<script src='https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js' type='text/javascript'></script>
 </head>
 <body>
 <div data-role='page' id='page_update'>
 <div data-role='header'><h3>OSBeeWiFi Firmware Update</h3></div>
 <div data-role='content'>
-<form method='POST' action='/update' id='fm' enctype='multipart/form-data'>
+<form method='POST' action='' id='fm' enctype='multipart/form-data'>
 <table cellspacing=4>
 <tr><td><input type='file' name='file' accept='.bin' id='file'></td></tr>
-<tr><td><b>Device key: </b><input type='password' name='dkey' size=16 maxlength=16 id='dkey'></td></tr>
+<tr><td><b>Device key: </b><input type='password' name='dkey' size=16 maxlength=64 id='dkey'></td></tr>
 <tr><td><label id='msg'></label></td></tr>
 </table>
 <div data-role='controlgroup' data-type='horizontal'>
-<a href='#' data-role='button' data-inline='true' data-theme='a' id='btn_cancel'>Cancel</a>
+<a href='#' data-rel='back' data-role='button' data-inline='true' data-theme='a'>Cancel</a>
 <a href='#' data-role='button' data-inline='true' data-theme='b' id='btn_submit'>Submit</a>
 </div>
 </form>
@@ -1225,9 +1324,6 @@ id('msg').innerHTML=s.fontcolor(c);
 if(t>0) setTimeout(clear_msg, t);
 }
 function goback() {history.back();}
-$('#btn_cancel').click(function(e){
-e.preventDefault(); goback();
-});  
 $('#btn_submit').click(function(e){
 var files= id('file').files;
 if(files.length==0) {show_msg('Please select a file.',2000,'red'); return;}
@@ -1254,7 +1350,8 @@ show_msg('Update failed.',0,'red');
 }
 }
 };
-xhr.open('POST', 'update', true);
+console.log('//'+window.location.hostname+':8080'+window.location.pathname);
+xhr.open('POST', '//'+window.location.hostname+':8080'+window.location.pathname, true);
 xhr.send(fd);
 });
 </script>

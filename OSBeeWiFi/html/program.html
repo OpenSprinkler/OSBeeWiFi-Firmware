@@ -1,9 +1,9 @@
 <head>
 <title>Edit Program</title>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<link rel='stylesheet' href='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' />
-<script src='http://code.jquery.com/jquery-1.9.1.min.js'></script>
-<script src='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js'></script>
+<link rel='stylesheet' href='https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' />
+<script src='https://code.jquery.com/jquery-1.9.1.min.js'></script>
+<script src='https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js'></script>
 <style>
 table td, table th { padding: 2; }
 </style>
@@ -141,13 +141,14 @@ function err_msg(e) {
   if(e===16) return 'missing data';
   if(e===17) return 'out of bound';
   return e;
-}  
+}
+function goback() {history.back();}
 function show_result(jd,m,t) {
   if(jd.result==2) show_msg('Device key is incorrect!');
   else if(jd.result!=1) show_msg('Error: '+err_msg(jd.result)+', item: '+jd.item+'.');
   else {
     $('#msg').html('<font color=green>'+m+'</font>');
-    if(t>0) setTimeout(close, t);
+    if(t>0) setTimeout(goback, t);
   }
 }
 var selected = -1;
@@ -332,7 +333,7 @@ function set_sts(v,sts) {
   }
 }
 $('#btn_cancel').click(function(){
-  if(confirm('Quit editing this program?')) close();
+  if(confirm('Quit editing this program?')) goback();
 });
 $('#btn_submit').click(function(){
   if($('#name').val().length==0) {show_msg('Program name is empty!');return;}

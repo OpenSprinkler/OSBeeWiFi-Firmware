@@ -55,13 +55,14 @@ void start_network_ap(const char *ssid, const char *pass) {
 void start_network_sta_with_ap(const char *ssid, const char *pass) {
   if(!ssid || !pass) return;
   DEBUG_PRINTLN(F("STA mode with AP"));
+  if(WiFi.getMode()!=WIFI_AP_STA) WiFi.mode(WIFI_AP_STA);
   WiFi.begin(ssid, pass);
 }
 
 void start_network_sta(const char *ssid, const char *pass) {
   if(!ssid || !pass) return;
   DEBUG_PRINTLN(F("STA mode"));
-  WiFi.mode(WIFI_STA);
+  if(WiFi.getMode()!=WIFI_STA) WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
 }
 

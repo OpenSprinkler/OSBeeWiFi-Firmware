@@ -57,6 +57,7 @@ OptionStruct OSBeeWiFi::options[] = {
   {"mod", OSB_MOD_AP,  255, ""},
   {"ssid", 0, 0, ""},  // string options have 0 max value
   {"pass", 0, 0, ""},
+  {"cld",  0, 2, ""},
   {"auth", 0, 0, ""},
   {"cdmn", 0, 0, "blynk.openthings.io"},
   {"cprt", 8080, 65535,""},
@@ -66,7 +67,8 @@ OptionStruct OSBeeWiFi::options[] = {
   {"zon1", 0, 0, "Zone 2"},
   {"zon2", 0, 0, "Zone 3"},
   {"bsvo", 0, 21, ""},
-  {"bsvc", 0, 21, ""},  
+  {"bsvc", 0, 21, ""},
+  {"dim",  2, 10, ""},
 };
 
 ulong OSBeeWiFi::curr_loc_time() {
@@ -132,6 +134,20 @@ void OSBeeWiFi::flashScreen() {
   boldFont(false);
   display.drawString(0, 45, vstring);
   display.display();
+}
+
+void OSBeeWiFi::lcd_set_brightness(byte v) {
+  static byte old_v = 255;
+  if(v==old_v) return;
+  if(v>10) v=10; // cap at 10
+  if(v) {
+    display.setBrightness(v*25);  // v is between [0,10] mapped to [0,250]
+    display.displayOn();
+  } else {
+    display.setBrightness(0);  // apaprently setting brightness to 0 does not turn it off
+    display.displayOff();  // so we have to explicitly turn off the display
+  }
+  old_v = v;
 }
 
 void OSBeeWiFi::boost(bool direction) {
@@ -239,7 +255,8 @@ int8_t OSBeeWiFi::find_option(String name) {
 
 void OSBeeWiFi::options_load() {
   File file = SPIFFS.open(config_fname, "r");
-  DEBUG_PRINT(F("loading config file..."));
+  DEBUG_PRINT(F("loading "));
+  DEBUG_PRINTLN(config_fname);
   if(!file) {
     DEBUG_PRINTLN(F("failed"));
     return;
@@ -247,6 +264,9 @@ void OSBeeWiFi::options_load() {
   while(file.available()) {
     String name = file.readStringUntil(':');
     String sval = file.readStringUntil('\n');
+		DEBUG_PRINT(name);
+		DEBUG_PRINT(":");
+		DEBUG_PRINTLN(sval);
     sval.trim();
     int8_t idx = find_option(name);
     if(idx<0) continue;
@@ -292,12 +312,12 @@ void OSBeeWiFi::set_led(byte status) {
   display.setColor(WHITE);
 }
 
-bool OSBeeWiFi::get_cloud_access_en() {
-  if(options[OPTION_AUTH].sval.length()==32) {
+/*bool OSBeeWiFi::get_cloud_access_en() {
+  if(options[OPTION_CLD].ival>0 && options[OPTION_AUTH].sval.length()>=32) {
     return true;
   }
   return false;
-}
+}*/
 
 void OSBeeWiFi::write_log(const LogStruct& data) {
   File file;

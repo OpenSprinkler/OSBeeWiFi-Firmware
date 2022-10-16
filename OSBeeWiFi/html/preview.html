@@ -1,17 +1,17 @@
 <head>
 <title>Program Preview</title>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
-<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 </head>
 <body>
 <div data-role='page' id='page_preview'>
   <div data-role='header' data-position='fixed'>
     <h3><span id='lbl_date'></span> Preview</h3>
-    <a href='#' id='btn_close' class='ui-btn ui-btn-icon-left ui-icon-delete'>Close</a>
+    <a href='#' data-rel='back' class='ui-btn ui-btn-icon-left ui-icon-back'>Back</a>
     <div data-role='controlgroup' data-type='horizontal' class='ui-btn-right'>
-      <a href='#' id='btn_prev' class='ui-btn ui-btn-icon-right ui-icon-arrow-l'>Prev</a>
+      <a href='#' id='btn_prev' class='ui-btn ui-btn-icon-left ui-icon-arrow-l'>Prev</a>
       <a href='#' id='btn_next' class='ui-btn ui-btn-icon-right ui-icon-arrow-r'>Next</a>
     </div>
   </div>
@@ -44,7 +44,6 @@
   </div>
 </div>
 <script>
-$('#btn_close').click(function(){close();});
 $('#btn_prev').click(function(){
   var t=date.getTime();
   if(t>=86400000) date.setTime(t-86400000);

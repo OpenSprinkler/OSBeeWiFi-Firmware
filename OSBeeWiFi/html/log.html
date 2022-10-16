@@ -1,14 +1,14 @@
 <head>
 <title>OSBeeWiFi</title>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<link rel='stylesheet' href='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' />
-<script src='http://code.jquery.com/jquery-1.9.1.min.js'></script>
-<script src='http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js'></script>
+<link rel='stylesheet' href='https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css' />
+<script src='https://code.jquery.com/jquery-1.9.1.min.js'></script>
+<script src='https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js'></script>
 </head>
 <body>
 <div data-role='page' id='page_log'>
   <div data-role='header'><h3 id='l_name'>Log</h3>
-  <a data-role='button' id='btn_close' data-theme='a' data-icon='delete' data-iconpos='left' class='ui-btn-left'>Close</a>
+  <a data-role='button' data-rel='back' data-theme='a' data-icon='back' data-iconpos='left' class='ui-btn-left'>Back</a>
   </div>
   <div data-role='content'>
     <p>Below are the most recent <label id='l_nr'></label> watering records</p>
@@ -25,7 +25,6 @@
   <script>
     var curr_time=0,ti=0;
     var jd;
-    $('#btn_close').click(function(){close();});
     $('#page_log').on('pagebeforeshow', function(){
       curr_time = (new Date()).getTime();
       show_time();

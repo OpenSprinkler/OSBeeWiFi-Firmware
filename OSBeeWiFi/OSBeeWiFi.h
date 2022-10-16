@@ -28,6 +28,7 @@
 #include <SSD1306.h>
 #include <i2crtc.h>
 #include <SPI.h>
+#include <Ticker.h>
 #include "defines.h"
 
 struct OptionStruct {
@@ -78,9 +79,9 @@ public:
   static void restart() { ESP.restart(); }
   static byte get_mode()   { return options[OPTION_MOD].ival; }
   static byte get_button() { return digitalRead(PIN_BUTTON); }
+  static void lcd_set_brightness(byte v);
   static void toggle_led();
   static void set_led(byte status);
-  static bool get_cloud_access_en();
   static int8_t find_option(String name);
   static void log_reset();
   static void write_log(const LogStruct& data);
@@ -88,6 +89,10 @@ public:
   static bool read_log_next(LogStruct& data);
   static bool read_log_end();
   static void boldFont(bool bold);
+  static void reset_to_ap() {
+    options[OPTION_MOD].ival = OSB_MOD_AP;
+    options_save();
+  }
 private:
   static byte st_pins[];
   static File log_file;

@@ -19,19 +19,7 @@
  * along with this program.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-
-#include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
-#include <ESP8266mDNS.h>
-#include <WiFiUdp.h>
-#include <time.h>
-#include <TimeLib.h>
-#include <FS.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <SSD1306.h>
-#include <i2crtc.h>
-#include <OSBeeWiFi.h>
+#include "OSBeeWiFi.h"
 
 void do_setup();
 void do_loop();
