@@ -591,7 +591,7 @@ void on_sta_run_program(const OTF::Request &req, OTF::Response &res) {
       else start_program(pid);
     }
   }
-  otf_send_result(res, HTML_UNAUTHORIZED, nullptr);
+  otf_send_result(res, HTML_SUCCESS, nullptr);
 }
 
 void on_sta_change_options(const OTF::Request &req, OTF::Response &res) {
@@ -893,10 +893,10 @@ void start_quick_program(uint16_t durs[]) {
   ulong start_time = curr_utc_time;
   for(byte i=0;i<MAX_NUMBER_ZONES;i++) {
     if(durs[i]) {
-      e[i].zbits = (1<<i);
-      e[i].dur = durs[i];
-      pd.scheduled_stop_times[i]=start_time+e[i].dur;
-      start_time=pd.scheduled_stop_times[i];
+      e[nt].zbits = (1<<i);
+      e[nt].dur = durs[i];
+      pd.scheduled_stop_times[nt]=start_time+e[nt].dur;
+      start_time=pd.scheduled_stop_times[nt];
       nt++;
     }
   }
@@ -1014,7 +1014,7 @@ void process_button() {
         osb.state = OSB_STATE_RESET;
       } else if(curr>button_down_time + BUTTON_WIFIRESET_TIMEOUT) {
         osb.state = OSB_STATE_WIFIRESET;
-      }else if(curr > button_down_time + 50) {
+      } else if(curr > button_down_time + 50) {
         disp_mode = (disp_mode+1) % NUM_DISP_MODES;
       }
       button_down_time = 0;
@@ -1431,6 +1431,7 @@ void do_loop() {
     disp.drawString(0, 32, "Rebooting...");    
     disp.display();
     restart_in(1000);
+    break;
     
   case OSB_STATE_RESET:
     DEBUG_PRINTLN(F("Fac reset"));
@@ -1480,6 +1481,9 @@ void do_loop() {
          curr_utc_time >= pd.scheduled_stop_times[pd.curr_task_index]) {
         // move on to the next task
         pd.curr_task_index++;
+        DEBUG_PRINT(pd.curr_task_index);
+        DEBUG_PRINT("/");
+        DEBUG_PRINTLN(pd.scheduled_ntasks);
         if(pd.curr_task_index >= pd.scheduled_ntasks) {
           // the program is now over
           DEBUG_PRINTLN("program finished");
@@ -1489,7 +1493,7 @@ void do_loop() {
           TaskStruct e;
           pd.load_curr_task(&e);
           osb.next_zbits = e.zbits;
-          pd.curr_prog_remaining_time = pd.scheduled_stop_times[pd.scheduled_ntasks-1]-curr_utc_time;      
+          pd.curr_prog_remaining_time = pd.scheduled_stop_times[pd.scheduled_ntasks-1]-curr_utc_time;
           pd.curr_task_remaining_time = pd.scheduled_stop_times[pd.curr_task_index]-curr_utc_time;
         }
       } else {

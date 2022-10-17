@@ -1342,7 +1342,7 @@ if(xhr.readyState==4 && xhr.status==200) {
 var jd=JSON.parse(xhr.responseText);
 if(jd.result==1) {
 show_msg('Update is successful. Rebooting. Please wait...',0,'green');
-setTimeout(goback, 10000);
+setTimeout(goback, 15000);
 } else if (jd.result==2) {
 show_msg('Check device key and try again.', 0, 'red');
 } else {
