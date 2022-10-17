@@ -412,6 +412,10 @@ void on_sta_change_controller(const OTF::Request &req, OTF::Response &res) {
     otf_send_result(res, HTML_SUCCESS, nullptr);
     restart_in(1000);
   }
+  if(req.getQueryParameter("resetwifi")!=NULL) {
+    otf_send_result(res, HTML_SUCCESS, nullptr);
+    osb.state = OSB_STATE_WIFIRESET;
+  }
 }
 
 // convert absolute remainder (reference time 1970 01-01) to relative remainder (reference time today)

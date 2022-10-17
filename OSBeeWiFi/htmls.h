@@ -398,8 +398,13 @@ w('<tr><td><label for=dur'+i+'>Zone '+(i+1)+' Duration (minutes):</label><input 
 <div data-role='fieldcontain'>
 <div data-role='controlgroup' data-type='horizontal'>
 <button data-theme='b' id='btn_submit'>Submit</button>
-<button data-theme='a' id='btn_reset'>Reset Zones</button>
-<button data-theme='a' id='btn_reboot'>Reboot</button>
+<button data-theme='c' id='btn_reset'>Reset Zones</button>
+<button data-theme='c' id='btn_reboot'>Reboot</button>
+</div>
+<span style='display:block;height:5px'></span>
+<div data-role='controlgroup' data-type='horizontal'>
+<button data-theme='c' id='btn_ap'>Reset WiFi</button>
+<button data-theme='c' id='btn_dl'>Delete Log</button>
 </div>
 </div>
 </div>
@@ -458,6 +463,13 @@ else comm+='&reset=1';
 comm='cc?dkey='+encodeURIComponent($('#dkey').val());
 if(!confirm('Reboot controller?')) return;
 else comm+='&reboot=1';
+} else if(id==='btn_ap') {
+comm='cc?dkey='+encodeURIComponent($('#dkey').val());
+if(!confirm('Reset WiFi to AP mode?')) return;
+else comm+='&resetwifi=1';
+} else if(id==='btn_dl') {
+comm='dl?dkey='+encodeURIComponent($('#dkey').val());
+if(!confirm('Delete log data?')) return;
 }
 $.getJSON(comm, function(jd) {
 if(jd.result!=1) {
@@ -1342,7 +1354,7 @@ if(xhr.readyState==4 && xhr.status==200) {
 var jd=JSON.parse(xhr.responseText);
 if(jd.result==1) {
 show_msg('Update is successful. Rebooting. Please wait...',0,'green');
-setTimeout(goback, 15000);
+setTimeout(goback, 18000);
 } else if (jd.result==2) {
 show_msg('Check device key and try again.', 0, 'red');
 } else {
