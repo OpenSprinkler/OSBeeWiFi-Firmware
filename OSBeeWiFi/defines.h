@@ -138,7 +138,7 @@ typedef enum {
 #define TIME_SYNC_TIMEOUT  3600
 
 /** Serial debug functions */
-#define SERIAL_DEBUG
+//#define SERIAL_DEBUG
 #if defined(SERIAL_DEBUG)
 
   #define DEBUG_BEGIN(x)   { Serial.begin(x); }
