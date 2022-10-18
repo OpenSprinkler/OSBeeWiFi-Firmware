@@ -2,10 +2,11 @@
 This folder contains the OpenSprinkler Bee WiFi (OSBeeWiFi) firmware code for Arduino with ESP8266 core. Below are some screen shots of the user interface. For details, visit [http://bee.opensprinkler.com](http://bee.opensprinkler.com)
 
 
-<img src="Screenshots/osbee1.png" height=180> <img src="Screenshots/osbee6.png" height=180> <img src="Screenshots/osbee5.png" height=180> <img src="Screenshots/osbee4.png" height=180> <img src="Screenshots/osbee3.png" height=180> <img src="Screenshots/osbee7.png" height=180> <img src="Screenshots/osbee8.png" height=180>
+<img src="Screenshots/osbee1.png" height=180> <img src="Screenshots/osbee5.png" height=180> <img src="Screenshots/osbee4.png" height=180> <img src="Screenshots/osbee3.png" height=180> <img src="Screenshots/osbee6.png" height=180> <img src="Screenshots/osbee7.png" height=180> <img src="Screenshots/osbee2.png" height=180> <img src="Screenshots/osbee8.png" height=180> <img src="Screenshots/osbee9.png" height=180>
 
 Updates:
 =======
+* (10/17/2022) Firmware 1.0.2 for OSBeeWiFi (support for both Blynk and OTC)
 * (02/09/2021) Update firmware for OSBeeWiFi version 3.0
 * (12/05/2016) Release first version of OSBeeWiFi firmware
 
@@ -14,9 +15,12 @@ Preparation:
 ===========
 
 * Install makeEspArduino (Method 1 below), or Arduino 1.6.x with ESP8266 core (Method 2 below)
-* Blynk library for Arduino (https://github.com/blynkkk/blynk-library)
-* SSD1306 library (https://github.com/squix78/esp8266-oled-ssd1306)
-* This (OSBeeWiFi) repository
+* ESP8266 core for Arduino v2.7.4 (https://github.com/esp8266/Arduino/releases/tag/2.7.4)
+* Blynk library for Arduino v1.0.1 (https://github.com/blynkkk/blynk-library/releases/tag/v1.0.1) 
+* SSD1306 library v4.2.1 (https://github.com/ThingPulse/esp8266-oled-ssd1306/releases/tag/4.2.1) 
+* OpenThingsFramework library ()https://github.com/OpenThingsIO/OpenThings-Framework-Firmware-Library)
+* WebSocket library v2.3.5 (https://github.com/Links2004/arduinoWebSockets/releases/tag/2.3.5)
+* This (OSBeeWiFi) source code
 
 
 Compilation:
@@ -28,7 +32,7 @@ If you are familiar with Makefile, I highly recommend you to use makeEspArduino:
 
 https://github.com/plerup/makeEspArduino
 
-Follow the instructions to install ESP8266 core files. Then download and copy the Blynk, and SSD1306libraries to the 'libraries' subfolder in your home folder's Arduino directory. The OSBeeWiFi source files has an example Makefile which you can modify to match your specific ESP8266 path.
+Follow the instructions to install ESP8266 core files. Then download or git clone the libraries listed above to the 'libraries' subfolder in your home folder's Arduino directory. The OSBeeWiFi source files has an example Makefile which you can modify to match your specific ESP8266 path.
 
 To compile the code, simply run 'make' in the OSBeeWiFi folder to compile the programs. The compiled firmware (named osbeeArduino.cpp.bin) by default exists in a temporary folder.
 
@@ -38,7 +42,7 @@ Go to http://arduino.cc to download and install the Arduino software. Then follo
 
 https://github.com/esp8266/Arduino
 
-to install the ESP8266 core for Arduino. Next, copy the Blynk, SSD1306, and OSBeeWiFi libraries to your Arduino's 'libraries' subfolder.
+to install the ESP8266 core 2.7.4 for Arduino. Next, install the libraries listed above in Arduino's.
 
 To compile, launch Arduino, select:
 
@@ -78,12 +82,7 @@ Next, modify the Makefile to change the serial port name to match yours. Then ru
 Firmware Features:
 =================
 
-The firmware supports a built-in web interface (which you can access using the device's local IP) as well as remote access using the Blynk app. 
-
-* Install Blynk App:
-
-It's recommended that you install the Blynk app, and scan the QR code (in the BlynkApp folder) before proceeding, in order to enable remote access right away. Once you have created the OSBeeWiFi app, you can go to the project settings to copy the authorization token.
-
+The firmware supports a built-in web interface (which you can access using the device's local IP) as well as remote access using either Blynk legacy app, or OpenThingsCloud (OTC) connection.
 
 * Initial Connection to WiFi:
 
@@ -95,42 +94,13 @@ to access the AP homepage. If you use Android phone, it may warn you about 'No I
 
 Select (or manually type in) the desired SSID, password, and (optionally) Blynk's authorization token (refer to the instructions above). If you don't want to input the Blynk token, you can leave it empty for now. Then click 'Submit'. Wait for 15 to 30 seconds for the device to connect to your router. If successful, it will display the local IP address with further instructions.
 
-
-* Reset to Factory Default:
-
-At any time, you can press and hold the pushbutton for at least 8 seconds, until the LCD displays the 'Resetting' message. At this point, the device will perform factory reset and restart in AP mode.
-
-
-* Using Blynk App:
-
-Assuming you've input the Blynk authorization token during the set up, you can now open the Blynk app and it should show the device status (e.g zone status, history etc.) in the Status tab, and control options in the Control tab. If any zone is running, you can click on 'Reset All' button in the Status tab to turn of all running zones.
-
-
-* Using the Built-in Web Interface:
-
-Open a browser and type in the device's local IP address. The build-in web interface allows you to:
-
-  - Check the device status
-  - Change settings
-  - Trigger zone actions
-  - Set programs and preview programs
-  - Manually run a program
-  - View log
-  - Reboot the device
-  - Update firmware
-  
-Certain operations require a device key, which by default is
-
-opendoor
-
-In Settings, you can change the time zone, device name, zone names, Blynk token, HTTP port, and device key etc. Changing certain options (such as token, HTTP port) requires a reboot.
-
+* For details of the other firmware features, please check the User Manual in the docs folder.
 
 
 Update Firmware:
 ===============
 
-The current firmware version is displayed at the homepage. When a new firmware becomes available, you can click on the 'Update' button next to the firmware version to upload the new firmware.
+The current firmware version is displayed at the homepage. When a new firmware becomes available, you can click on the 'Update' button on the homepage to upload a new firmware.
 
 If the update ever fails, power cycle (unplug power and plug back power) the device and try again. If it still doesn't work, you can update firmware through the USB port (see instructions above).
 
