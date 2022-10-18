@@ -2,7 +2,7 @@
 This folder contains the OpenSprinkler Bee WiFi (OSBeeWiFi) firmware code for Arduino with ESP8266 core. Below are some screen shots of the user interface. For details, visit [http://bee.opensprinkler.com](http://bee.opensprinkler.com)
 
 
-<img src="Screenshots/osbee1.png" height=180> <img src="Screenshots/osbee5.png" height=180> <img src="Screenshots/osbee4.png" height=180> <img src="Screenshots/osbee3.png" height=180> <img src="Screenshots/osbee6.png" height=180> <img src="Screenshots/osbee7.png" height=180> <img src="Screenshots/osbee2.png" height=180> <img src="Screenshots/osbee8.png" height=180> <img src="Screenshots/osbee9.png" height=180>
+<img src="Screenshots/osbee1.png" height=240> <img src="Screenshots/osbee5.png" height=240> <img src="Screenshots/osbee4.png" height=180> <img src="Screenshots/osbee3.png" height=180> <img src="Screenshots/osbee6.png" height=180> <img src="Screenshots/osbee7.png" height=180> <img src="Screenshots/osbee2.png" height=180> <img src="Screenshots/osbee8.png" height=180> <img src="Screenshots/osbee9.png" height=180>
 
 Updates:
 =======
