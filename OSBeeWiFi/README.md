@@ -3,13 +3,13 @@ Firmware Compilation Instructions
 
 There are three methods to compile the firmware. You can choose any of them.
 
-#### Method 1: Use PlatformIO
+Method 1: Use PlatformIO
 =======
 
 Install Visual Studio Code (VS Code) (https://code.visualstudio.com/). Then launch VS Code and install the **platformio** extension. Once the extension is installed, open this `OSBeeWiFi` folder. A `platformio.ini` file is provided in the folder, which defines all libraries and settings required to compile the firmware. Click `PlatformIO:Build` at the bottom of the screen to build the firwmare.
 
 
-### Method 2: Use makeEspArduino and Makefile
+Method 2: Use makeEspArduino and Makefile
 =======
 
 #### Step A: Install ESP8266 core and required libraries
@@ -24,7 +24,7 @@ Follow https://github.com/plerup/makeEspArduino to install **ESP8266 core 2.7.4*
 #### Step B: Use the Makefile
 To compile the firmware code using makeESPArduino, simply run `make` in command line. Before doing so, you probaby need to open `Makefile` and modify some path variables therein to match where you installed the `esp8266` folder.
 
-### Method 3: Use the Arduino IDE
+Method 3: Use the Arduino IDE
 =======
 
 #### Step A: Install Arduino IDE, ESP8266 core, and required libraries
