@@ -11,49 +11,11 @@ Updates:
 * (12/05/2016) Release first version of OSBeeWiFi firmware
 
 
-Preparation:
-===========
+Firmware Compilation Instructions
+=======
+Check README.md in the `OSBeeWiFi` folder.
 
-* Install makeEspArduino (Method 1 below), or Arduino 1.6.x with ESP8266 core (Method 2 below)
-* ESP8266 core for Arduino v2.7.4 (https://github.com/esp8266/Arduino/releases/tag/2.7.4)
-* Blynk library for Arduino v1.0.1 (https://github.com/blynkkk/blynk-library/releases/tag/v1.0.1) 
-* SSD1306 library v4.2.1 (https://github.com/ThingPulse/esp8266-oled-ssd1306/releases/tag/4.2.1) 
-* OpenThingsFramework library ()https://github.com/OpenThingsIO/OpenThings-Framework-Firmware-Library)
-* WebSocket library v2.3.5 (https://github.com/Links2004/arduinoWebSockets/releases/tag/2.3.5)
-* This (OSBeeWiFi) source code
-
-
-Compilation:
-===========
-
-#### Method 1: use makeEspArduino
-
-If you are familiar with Makefile, I highly recommend you to use makeEspArduino:
-
-https://github.com/plerup/makeEspArduino
-
-Follow the instructions to install ESP8266 core files. Then download or git clone the libraries listed above to the 'libraries' subfolder in your home folder's Arduino directory. The OSBeeWiFi source files has an example Makefile which you can modify to match your specific ESP8266 path.
-
-To compile the code, simply run 'make' in the OSBeeWiFi folder to compile the programs. The compiled firmware (named osbeeArduino.cpp.bin) by default exists in a temporary folder.
-
-#### Method 2: use Arduino IDE
-
-Go to http://arduino.cc to download and install the Arduino software. Then follow the instructions at:
-
-https://github.com/esp8266/Arduino
-
-to install the ESP8266 core 2.7.4 for Arduino. Next, install the libraries listed above in Arduino's.
-
-To compile, launch Arduino, select:
-
-* File -> Examples -> OSBeeWiFi -> osbeeMain.
-* Tools -> Board -> Generic ESP8266 Module (if this is not available, check if you've installed the ESP8266 core).
-* Tools -> Flash Size -> 4M (2M SPIFFS).
-
-Press Ctrl + R to compile. The compiled firmware (named osbeeMain.cpp.bin) by default exists in a temporary folder.
-
-
-Upload Firmware:
+Update Firmware:
 =========
 
 As OSBeeWiFi firmware supports OTA (over-the-air) update, it's highly recommended that you upload the firmware through the web interface.
@@ -105,6 +67,4 @@ The current firmware version is displayed at the homepage. When a new firmware b
 If the update ever fails, power cycle (unplug power and plug back power) the device and try again. If it still doesn't work, you can update firmware through the USB port (see instructions above).
 
 
-Notes about Modifying Firmware:
-===============
-You can change the firmware code to add new features and follow the instructions above to compile and upload. Note that the built-in user interface embeds HTML files to the firmware source code. To modify the HTML files (so that you can change how the webpages are rendered), go to the html/ subfolder, which contains the original HTML files. Make any changes necessary, and use the html2raw tool to convert these HTML files into program memory strings (which are saved in htmls.h). Every time you make changes to the HTML files, you must re-run html2raw in the html folder to re-generate the program memory strings.
+
