@@ -5,11 +5,13 @@ There are three methods to compile the firmware. You can choose any of them.
 
 #### Method 1: Use PlatformIO
 ===========
+
 Install Visual Studio Code (VS Code) (https://code.visualstudio.com/). Then launch VS Code and install the **platformio** extension. Once the extension is installed, open this `OSBeeWiFi` folder. A `platformio.ini` file is provided in the folder, which defines all libraries and settings required to compile the firmware. Click `PlatformIO:Build` at the bottom of the screen to build the firwmare.
 
 
 ### Method 2: Use makeEspArduino and Makefile
 ===========
+
 #### Step A: Install ESP8266 core and required libraries
 Follow https://github.com/plerup/makeEspArduino to install **ESP8266 core 2.7.4**. Then download or `git clone` the following libraries to a folder such as `$(HOME)/Arduino/libraries` (note the version of each library):
 
@@ -43,4 +45,5 @@ Press Ctrl + R to compile. The compiled firmware (named osbeeMain.cpp.bin) by de
 
 Notes about Modifying Firmware:
 ===============
+
 You can change the firmware code to add new features and follow the instructions above to compile and upload. Note that the built-in user interface embeds HTML files to the firmware source code. To modify the HTML files (so that you can change how the webpages are rendered), go to the html/ subfolder, which contains the original HTML files. Make any changes necessary, and use the html2raw tool to convert these HTML files into program memory strings (which are saved in htmls.h). Every time you make changes to the HTML files, you must re-run html2raw in the html folder to re-generate the program memory strings.
