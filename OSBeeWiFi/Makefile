@@ -1,4 +1,4 @@
-SKETCH = ./examples/osbeeMain/osbeeMain.ino
+SKETCH = ./osbeeMain.ino
 
 LIBS = . \
 $(ESP_LIBS)/Wire \

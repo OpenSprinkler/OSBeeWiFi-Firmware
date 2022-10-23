@@ -25,12 +25,13 @@
   #define BLYNK_PRINT Serial
 #endif
 
-#include <BlynkSimpleEsp8266.h>
+#include <ESP8266WiFi.h>
+#include <WiFiUdp.h>
 #include <DNSServer.h>
-#include <OpenThingsFramework.h>
 #include <Request.h>
 #include <Response.h>
-#include <WiFiUdp.h>
+#include <OpenThingsFramework.h>
+#include <BlynkSimpleEsp8266.h>
 #include "TimeLib.h"
 #include "OSBeeWiFi.h"
 #include "espconnect.h"
@@ -208,8 +209,7 @@ String get_ap_ssid() {
 }
 
 String get_ip(IPAddress _ip) {
-  String ip = "";
-  ip = _ip[0];
+  String ip = String(_ip[0]);
   ip += ".";
   ip += _ip[1];
   ip += ".";
@@ -842,6 +842,33 @@ void on_sta_delete_log(const OTF::Request &req, OTF::Response &res) {
   otf_send_result(res, HTML_SUCCESS, nullptr);
 }
 
+void on_sta_debug(const OTF::Request &req, OTF::Response &res) {
+	String json = "";
+	json += F("{");
+	json += F(",\"fwv\":");
+	json += osb.options[OPTION_FWV].ival;
+	json += F(",\"name\":\"");
+	json += osb.options[OPTION_NAME].sval;
+	json += F("\",\"mac\":\"");
+	json += get_mac();
+	json += F("\",\"devip\":\"");
+	json += WiFi.localIP().toString();
+	json += F("\",\"cid\":");
+	json += ESP.getChipId();
+	json += F(",\"rssi\":");
+	json += (int16_t)WiFi.RSSI();
+	json += F(",\"bssid\":\"");
+	json += WiFi.BSSIDstr();
+	json += F("\",\"build\":\"");
+	json += (F(__DATE__));
+	json += F("\",\"Freeheap\":");
+	json += (uint16_t)ESP.getFreeHeap();
+	json += F(",\"flash_size\":");
+	json += (uint32_t)ESP.getFlashChipRealSize();
+	json += F("}");
+	otf_send_json(res, json);
+}
+
 const char* weekday_name(ulong t) {
   t /= 86400L;
   t = (t+3) % 7;  // Jan 1, 1970 is a Thursday
@@ -1354,6 +1381,7 @@ void do_loop() {
       otf->on("/dp", on_sta_delete_program);
       otf->on("/rp", on_sta_run_program);
       otf->on("/dl", on_sta_delete_log);
+      otf->on("/db", on_sta_debug);
       updateServer->begin();
 
       String host = get_ap_ssid();
