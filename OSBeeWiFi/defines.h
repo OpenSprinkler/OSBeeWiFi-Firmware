@@ -24,7 +24,7 @@
 #define _DEFINES_H
 
 /** Firmware version, hardware version, and maximal values */
-#define OSB_FWV    102    // Firmware version: 102 means 1.0.2
+#define OSB_FWV    103    // Firmware version: 103 means 1.0.3
 
 /** GPIO pins */
 #define PIN_VER_DETECT 10	// Version detection pin
@@ -48,6 +48,9 @@
 #define DEFAULT_DKEY    "opendoor"
 // Default location
 #define DEFAULT_LOCA    "Boston,MA"
+// Default Boost Voltage
+#define DEFAULT_BOOST_VOLTAGE 9
+
 // Config file name
 #define CONFIG_FNAME    "/config.dat"
 // Log file name

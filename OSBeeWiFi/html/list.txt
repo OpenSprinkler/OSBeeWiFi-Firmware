@@ -1,9 +1,0 @@
-ap_update.html
-connect.html
-index.html
-log.html
-manual.html
-preview.html
-program.html
-settings.html
-update.html

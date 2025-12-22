@@ -6,6 +6,7 @@ This folder contains the OpenSprinkler Bee WiFi (OSBeeWiFi) firmware code for Ar
 
 Updates:
 =======
+* (12/21/2025) Firmware 1.0.3 for OSBeeWiFi (update ESP8266 core and OTC library, change default boost voltage to 9V)
 * (10/17/2022) Firmware 1.0.2 for OSBeeWiFi (support for both Blynk and OTC)
 * (02/09/2021) Update firmware for OSBeeWiFi version 3.0
 * (12/05/2016) Release first version of OSBeeWiFi firmware

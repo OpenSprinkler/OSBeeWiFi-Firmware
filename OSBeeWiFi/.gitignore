@@ -3,3 +3,10 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+*.sh
+*.lin
+*.bin
+*.osx
+esptool*
+makeblink
+examples

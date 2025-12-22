@@ -66,8 +66,8 @@ OptionStruct OSBeeWiFi::options[] = {
   {"zon0", 0, 0, "Zone 1"},
   {"zon1", 0, 0, "Zone 2"},
   {"zon2", 0, 0, "Zone 3"},
-  {"bsvo", 0, 21, ""},
-  {"bsvc", 0, 21, ""},
+  {"bsvo", DEFAULT_BOOST_VOLTAGE, 21, ""},
+  {"bsvc", DEFAULT_BOOST_VOLTAGE, 21, ""},
   {"dim",  2, 10, ""},
 };
 
@@ -160,7 +160,7 @@ void OSBeeWiFi::boost(bool direction) {
   } else {
     // version 3 uses A0 to control boosted voltage
     digitalWrite(PIN_BSTPWR, HIGH);
-    uint16_t volt=21; // maximum voltage by design is 21 volt
+    uint16_t volt = DEFAULT_BOOST_VOLTAGE; // use default boost voltage
     if(direction==OPEN) {
       if(options[OPTION_BSVO].ival>=5) volt=options[OPTION_BSVO].ival; // if bsvo is defined
     } else {

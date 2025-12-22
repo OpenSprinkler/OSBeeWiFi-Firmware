@@ -3,10 +3,15 @@ Firmware Compilation Instructions
 
 There are three methods to compile the firmware. You can choose any of them.
 
-Method 1: Use PlatformIO
+Method 1: Use PlatformIO (Recommended)
 =======
 
-Install Visual Studio Code (VS Code) (https://code.visualstudio.com/). Then launch VS Code and install the **platformio** extension. Once the extension is installed, open this `OSBeeWiFi` folder. A `platformio.ini` file is provided in the folder, which defines all libraries and settings required to compile the firmware. Click `PlatformIO:Build` at the bottom of the screen to build the firwmare.
+* Install Visual Studio Code (VS Code) (https://code.visualstudio.com/).
+* Install the latest LTS version of Node.js from https://nodejs.org/ if you don't already have it.
+* In your terminal, navigate to the OSBeeWiFi-Firmware/OSBeeWiFi folder (the source code folder) and run `npm install html-minifier-terser`.
+* Launch VS Code and install the **platformio** extension.
+* Once the extension is installed, open the source code folder `OSBeeWiFi` folder. A `platformio.ini` file is provided in the folder, which defines all libraries and settings required to compile the firmware.
+* Click `PlatformIO:Build` at the bottom of the screen to build the firwmare.
 
 
 Method 2: Use makeEspArduino and Makefile
